@@ -1,31 +1,32 @@
+name: SmartActors
 title: SmartTools - Tutorials
-email: tutorials@smart-tools.info
 description: > # this means to ignore newlines until "baseurl:"
   Here are some examples and tutorials how to use SmartActors library.
 baseurl: "/tutorials"
-url: "https://http://smarttools.github.io"
+url: "https://smarttools.github.io"
 github_username:  SmartTools
 encoding: utf-8
+
+VERSION: 0.3.3
+
+ASSET_PATH: false
 
 # Build settings
 markdown: kramdown
 kramdown:
   input: GFM
   hard_wrap: false
-theme: minima
-permalink: pretty
+permalink: /:categories/:year/:month/:day/:title
 highlighter: rouge
 gems:
   - jekyll-feed
 
 # Exclude from processing.
-# The following items will not be processed, by default. Create a custom list
-# to override the default setting.
-# exclude:
-#   - Gemfile
-#   - Gemfile.lock
-#   - node_modules
-#   - vendor/bundle/
-#   - vendor/cache/
-#   - vendor/gems/
-#   - vendor/ruby/
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
