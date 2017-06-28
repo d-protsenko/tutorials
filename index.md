@@ -1,8 +1,17 @@
 ---
-# You don't need to edit this file, it's empty on purpose.
-# Edit theme's home layout instead if you wanna make some changes
-# See: https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 layout: page
 ---
 
 # SmartActors tutorials
+
+* [Quickstart guides](quickstart/)
+* [DAS tool](das/)
+
+# Other documentation
+
+* [Maven site for __master__ branch of smartactors-core](http://smarttools.github.io//smartactors-core/)
+* [Maven site for __develop__ branch of smartactors-core](http://smarttools.github.io//smartactors-core/develop/)
+
+# Sources
+
+* [GitHub project](https://github.com/SmartTools/smartactors-core)

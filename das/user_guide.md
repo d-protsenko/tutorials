@@ -1,3 +1,10 @@
+---
+layout: page
+title: Das User's Guide
+description: Das User's Guide
+group: das
+---
+
 # Das User's Guide
 
 ## Conventions
