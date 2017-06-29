@@ -7,6 +7,10 @@ group: quickstart
 
 # Quickstart
 
+## Start
+
+[How to start using SmartActors](how_to_start.md)
+
 ## Basics
 
 [How to use IOC](IOCExample.html)
