@@ -15,7 +15,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>GetItemsActor</module>
+        <module>ItemsActor</module>
         <module>ItemsFeatureDistribution</module>
     </modules>
 

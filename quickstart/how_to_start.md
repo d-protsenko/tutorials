@@ -135,46 +135,244 @@ Note that Project's `pom.xml` references Feature's `pom.xml` as a submodule. And
 
 ### Create the Actor
 
-Create the new Actor, use `ca` subcommand. The actor name is "GetItemsActor". It's located in the "ItemsFeature".
+Create the new Actor, use `ca` subcommand. The actor name is "ItemsActor". It's located in the "ItemsFeature".
 
 ```console
-$ das ca -an GetItemsActor -fn ItemsFeature
+$ das ca -an ItemsActor -fn ItemsFeature
 Distributed Actor System. Design, assembly and deploy tools.
 Version 0.3.3.
 Creating actor ...
 Actor has been created successful.
 ```
 
-The new folder "GetItemsActor" is created under the Feature folder. Check it's content.
+The new folder "ItemsActor" is created under the Feature folder. Check it's content.
 
 ```console
 $ ls ItemsFeature
-config.json  GetItemsActor  ItemsFeatureDistribution  pom.xml
-$ ls ItemsFeature/GetItemsActor
+config.json  ItemsActor  ItemsFeatureDistribution pom.xml
+$ ls ItemsFeature/ItemsActor
 pom.xml  src
-$ ls ItemsFeature/GetItemsActor/src
+$ ls ItemsFeature/ItemsActor/src
 main  test
-$ ls ItemsFeature/GetItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/get_items_actor/*
-ItemsFeature/GetItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/get_items_actor/GetItemsActor.java
+$ ls ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/*
+ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/ItemsActor.java
 
-ItemsFeature/GetItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/get_items_actor/exception:
-GetItemsActorException.template
+ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/exception:
+ItemsActorException.template
 
-ItemsFeature/GetItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/get_items_actor/wrapper:
-GetItemsActorWrapper.template
+ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/wrapper:
+ItemsActorWrapper.template
 ```
 
 The new Maven module is created for the Actor. This module is a submodule of the Feature.
 
+### Write the code of the Actor
+
 It's time to open the whole Project in your IDE. Open the `pom.xml` in the Project folder as a Maven IDE project.
 
+Our Actor will keep the list of items in memory (as it's private field) and gives access to the list.
+It'll have two handlers (methods): to retrieve the whole list and to add a new item.
 
+Note in this case the Actor is the owner of the items list. All operations over the list should be performed through this Actor.
+
+#### Write exceptions
+
+Typically each actor has it's own exception type throwing from its methods.
+
+Rename `ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/exception/ItemsActorException.template` into `ItemsActorException.java` and fill it with the content.
+
+```java
+package info.smart_tools.examples.items.items_feature.items_actor.exception;
+
+public class ItemsActorException extends Exception {
+
+    public ItemsActorException(final String message) {
+        super(message);
+    }
+
+    public ItemsActorException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public ItemsActorException(final Throwable cause) {
+        super(cause);
+    }
+}
+```
+
+Note that you can define more than one exception, specific for each exceptional case in your Actor.
+
+#### Write wrappers
+
+Wrappers are interfaces to the data the Actor need access to or provides.
+
+Because our Actor has two handlers, we should define two wrappers: to get all items and to add a new item.
+
+Copy and rename `Items/ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/wrapper/ItemsActorWrapper.template` into `GetAllItemsWrapper.java` and `AddNewItemWrapper.java`.
+
+`GetAllItemsWrapper` is the interface with a method to set a list of items. These are data going _out_ of the Actor, so the Actor should _set_ the list to the processing message.
+
+```java
+package info.smart_tools.examples.items.items_feature.items_actor.wrapper;
+
+import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
+
+import java.util.List;
+
+
+public interface GetAllItemsWrapper {
+
+    /**
+     * The Actors sets of list of all items here.
+     * @throws ChangeValueException when the set fails
+     */
+    void setAllItems(final List<String> items)
+            throws ChangeValueException;
+
+}
+```
+
+`AddNewItemWrapper` is the interface with a method to _get_ a new item name. These are data going _into_ the Actor, so the Actor should _get_ them from the processing message.
+
+```java
+package info.smart_tools.examples.items.items_feature.items_actor.wrapper;
+
+import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
+
+public interface AddNewItemWrapper {
+
+    /**
+     * The gets the new item name here.
+     * @return the new item name
+     * @throws ReadValueException when the get fails
+     */
+    String getNewItemName()
+            throws ReadValueException;
+}
+```
+
+Note getters and setters of the Wrapper must throw `ReadValueException` and `ChangeValueException` respectively.
+
+#### Write the Actor
+
+Take the file `Items/ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/ItemsActor.java` and modify it.
+
+It's necessary to add two methods: to retrieve all items and to add a new item. Each method takes one argument with the necessary Wrapper type and returns `void`. Each method throws the specific exception.
+
+```java
+package info.smart_tools.examples.items.items_feature.items_actor;
+
+import info.smart_tools.examples.items.items_feature.items_actor.exception.ItemsActorException;
+import info.smart_tools.examples.items.items_feature.items_actor.wrapper.AddNewItemWrapper;
+import info.smart_tools.examples.items.items_feature.items_actor.wrapper.GetAllItemsWrapper;
+import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
+import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class ItemsActor {
+
+    private final List<String> items = new ArrayList<>();
+
+    /**
+     * Retrieves the list of all items.
+     * @param wrapper the wrapper where to set the list
+     * @throws ItemsActorException if something goes wrong
+     */
+    public void getAllItems(final GetAllItemsWrapper wrapper) throws ItemsActorException {
+        try {
+            wrapper.setAllItems(Collections.unmodifiableList(items));
+        } catch (ChangeValueException e) {
+            throw new ItemsActorException("Failed to set list", e);
+        }
+    }
+
+    /**
+     * Add the new item to the list.
+     * @param wrapper the wrapper where to get the name of the new item
+     * @throws ItemsActorException if something goes wrong
+     */
+    public void addNewItem(final AddNewItemWrapper wrapper) throws ItemsActorException {
+        try {
+            items.add(wrapper.getNewItemName());
+        } catch (ReadValueException e) {
+            throw new ItemsActorException("Failed to get item name", e);
+        }
+    }
+
+}
+```
+
+#### Test the Actor
+
+Note the Actor is just a Java class which uses some specific interfaces.
+It's possible to test it completely independently by mock implementations of the wrappers.
+You can use [Mockito](http://site.mockito.org/) for it.
+
+Modify `/home/gelin/work/7bits/smart-tools/tutorials/src/how_to_start/Items/ItemsFeature/ItemsActor/src/test/java/info/smart_tools/examples/items/items_feature/items_actor/ItemsActorTest.java`.
+
+```java
+package info.smart_tools.examples.items.items_feature.items_actor;
+
+import info.smart_tools.examples.items.items_feature.items_actor.exception.ItemsActorException;
+import info.smart_tools.examples.items.items_feature.items_actor.wrapper.AddNewItemWrapper;
+import info.smart_tools.examples.items.items_feature.items_actor.wrapper.GetAllItemsWrapper;
+import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
+import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+public class ItemsActorTest {
+
+    private ItemsActor actor;
+
+    @Before
+    public void init() {
+        actor = new ItemsActor();
+    }
+
+    private List getListFromWrapper(final GetAllItemsWrapper mock) throws ChangeValueException {
+        ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+        verify(mock).setAllItems(captor.capture());
+        return captor.getValue();
+    }
+
+    @Test
+    public void testAddOneItem() throws ItemsActorException, ChangeValueException, ReadValueException {
+        GetAllItemsWrapper getAllWrapperBefore = mock(GetAllItemsWrapper.class);
+        actor.getAllItems(getAllWrapperBefore);
+        assertEquals(Collections.emptyList(), getListFromWrapper(getAllWrapperBefore));
+
+        AddNewItemWrapper newItemWrapper = mock(AddNewItemWrapper.class);
+        when(newItemWrapper.getNewItemName()).thenReturn("new item");
+        actor.addNewItem(newItemWrapper);
+        verify(newItemWrapper).getNewItemName();
+
+        GetAllItemsWrapper getAllWrapperAfter = mock(GetAllItemsWrapper.class);
+        actor.getAllItems(getAllWrapperAfter);
+        List<String> expected = new ArrayList<>();
+        expected.add("new item");
+        assertEquals(expected, getListFromWrapper(getAllWrapperAfter));
+    }
+
+}
+```
+
+Note `das` already added all dependencies necessary for the test.
 
 ### Create the Plugin
-
-### Create one more Actor
-
-### Create one more Plugin
 
 ### Build the Feature
 

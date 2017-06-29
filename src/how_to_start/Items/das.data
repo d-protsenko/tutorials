@@ -1,9 +1,9 @@
 {
   "features" : [ {
   "actors" : [ {
-  "artifactId" : "get-items-actor",
+  "artifactId" : "items-actor",
   "uploadRepositories" : [ ],
-  "rawName" : "GetItemsActor",
+  "rawName" : "ItemsActor",
   "version" : "0.1.0-SNAPSHOT"
 } ],
   "uploadRepositories" : [ ],
