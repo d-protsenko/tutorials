@@ -594,7 +594,7 @@ You should define the "endpoints" section with the TCP port the server will list
   "afterFeatures": [],
   "objects": [
     {
-      "name": "router"
+      "name": "router",
       "kind": "raw",
       "dependency": "info.smart_tools.smartactors.message_processing.chain_call_receiver.ChainCallReceiver",
       "strategyDependency": "chain choice strategy"
