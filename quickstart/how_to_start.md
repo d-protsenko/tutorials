@@ -31,7 +31,7 @@ __Wrapper__ — an object which is passed to the methods of an Actor. It wraps t
 
 __Config__ — a `config.json` file, a part of a Feature. Configs from all loaded Features are joined together and form an aggregate config of the Server. The config defines: set of objects to create in the Server's IOC, typically they are Actors; Maps; other metadata and handlers of system events.
 
-__Map__, __Chain__ — the list of actors in the specified order to process a message step by step. On each step the message is wrapped and passed to the Actor's handler, the Actor makes some modifications in the message atomically, then the message is passed to the next Actor. This is the core idea, how independent Actors work together.
+__Map__, __Message Map__, __Chain__ — the list of actors in the specified order to process a message step by step. On each step the message is wrapped and passed to the Actor's handler, the Actor makes some modifications in the message atomically, then the message is passed to the next Actor. This is the core idea, how independent Actors work together.
 
 __Plugin__ — a part of a Feature, contains code to initialize the Feature, in most cases registers new strategies to IOC. Plugins may depend on other plugins.
 
@@ -462,7 +462,7 @@ We define two Maps: one to get all items, another to add a new item. Our ItemsAc
 
 For each Actor in the Map it's necessary to define mapping of the message fields to the Wrapper methods. Note, "in" parameters corresponds to getters in the Wrapper and transfers data _into_ the Actor, while "out" parameters corresponds to setters in the Wrapper and transfers data _out from_ the Actor. The "message/" prefix of the mapping values means we work with the fields of the Message passing between the Actors, also there are other context objects we don't touch in this example.
 
-Because our server will serve HTTP requests and it should return some responses, we add to the end of each Map the system Actor named "responseSender".
+Because our server will serve HTTP requests and it should return some responses, we add to the end of each Map the system Actor named "responseSender". Also this actor must be listed in "objects". Note, it's better to register system actors in a separate configuration Feature single for the Project.
 
 The "exceptional" property for each Map defines how to process exceptions during the processing. Here it's empty array.
 
@@ -477,6 +477,11 @@ Modify the config of the Feature: `ItemsFeature/config.json`.
       "name": "items-actor",
       "kind": "actor",
       "dependency": "ItemsActor"
+    },
+    {
+      "name": "responseSender",
+      "kind": "stateless_actor",
+      "dependency": "ResponseSenderActor"
     }
   ],
   "maps": [
@@ -529,7 +534,7 @@ $ das make
 make project
 [INFO] Scanning for projects...
 
-... many output from Maven
+... many output from Maven ...
 
 [INFO] --- maven-assembly-plugin:3.0.0:single (default) @ items-feature-distribution ---
 [INFO] Reading assembly descriptor: bin.xml
@@ -573,11 +578,7 @@ $ das cs -sn ItemsServer
 Distributed Actor System. Design, assembly and deploy tools.
 Version 0.3.3.
 Creating server ...
-Jun 30, 2017 1:26:38 PM org.hibernate.validator.internal.util.Version <clinit>
-INFO: HV000001: Hibernate Validator 5.1.2.Final
-SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-SLF4J: Defaulting to no-operation (NOP) logger implementation
-SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+... some warnings skipped ...
 Server has been created successful.
 ```
 
@@ -603,11 +604,7 @@ $ das dc -path ItemsServer
 Distributed Actor System. Design, assembly and deploy tools.
 Version 0.3.3.
 Download server core ...
-Jun 30, 2017 1:33:14 PM org.hibernate.validator.internal.util.Version <clinit>
-INFO: HV000001: Hibernate Validator 5.1.2.Final
-SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-SLF4J: Defaulting to no-operation (NOP) logger implementation
-SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+... some warnings skipped ...
 Server core has been downloaded successful.
 ```
 
@@ -621,6 +618,16 @@ configuration-manager-plugins-0.3.3  field-plugins-0.3.3              ioc-plugin
 core-service-starter-0.3.3           iobject-0.3.3                    ioc-strategy-pack-0.3.3          scope-0.3.3
 dumpable-interface-0.3.3             iobject-extension-0.3.3          ioc-strategy-pack-plugins-0.3.3  scope-plugins-0.3.3
 feature-loading-system-0.3.3         iobject-extension-plugins-0.3.3  message-processing-0.3.3         task-0.3.3
+```
+
+### Add core Features
+
+We want our server to receive HTTP requests and reply with a response. So we need to add "http-endpoint" core Feature and it's dependencies. This Feature contains the definition of "response-sender" actor.
+
+Where to download the core Features and ids of their artifacts must be listed in `ItemsServer/corefeatures/features.json` file. Create this file.
+
+```json
+
 ```
 
 ### Add custom Features

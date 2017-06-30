@@ -1,0 +1,46 @@
+{
+  "repositories": [
+    {
+      "repositoryId": "archiva.smartactors-features",
+      "type": "default",
+      "url": "http://archiva.smart-tools.info/repository/smartactors-features/"
+    }
+  ],
+  "features": [
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "http-endpoint",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "http-endpoint-plugins",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "endpoint",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "endpoint-plugins",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "endpoint-service-starter",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "message-bus",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "message-bus-service-starter",
+      "version": "0.3.3"
+    }
+  ]
+}

@@ -1,2 +1,5 @@
-ItemsServer
+ItemsServer/*
+!ItemsServer/corefeatures/
+ItemsServer/corefeatures/*
+!ItemsServer/corefeatures/features.json
 *.zip
