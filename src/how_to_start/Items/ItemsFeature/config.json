@@ -1,4 +1,49 @@
 {
   "featureName": "info.smart_tools.examples.items:items-feature",
-  "afterFeatures": []
+  "afterFeatures": [],
+  "objects": [
+    {
+      "name": "items-actor",
+      "kind": "actor",
+      "dependency": "ItemsActor"
+    }
+  ],
+  "maps": [
+    {
+      "id": "get-all-items",
+      "steps": [
+        {
+          "target": "items-actor",
+          "handler": "getAllItems",
+          "wrapper": {
+            "out_setAllItems": "message/items"
+          }
+        },
+        {
+          "target": "responseSender",
+          "handler": "sendResponse"
+        }
+      ],
+      "exceptional": [
+      ]
+    },
+    {
+      "id": "add-new-item",
+      "steps": [
+        {
+          "target": "items-actor",
+          "handler": "addNewItem",
+          "wrapper": {
+            "in_getNewItemName": "message/name"
+          }
+        },
+        {
+          "target": "responseSender",
+          "handler": "sendResponse"
+        }
+      ],
+      "exceptional": [
+      ]
+    }
+  ]
 }

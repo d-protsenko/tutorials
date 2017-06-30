@@ -16,6 +16,7 @@
 
     <modules>
         <module>ItemsActor</module>
+        <module>ItemsActorPlugin</module>
         <module>ItemsFeatureDistribution</module>
     </modules>
 

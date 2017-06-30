@@ -7,7 +7,12 @@
   "version" : "0.1.0-SNAPSHOT"
 } ],
   "uploadRepositories" : [ ],
-  "plugins" : [ ],
+  "plugins" : [ {
+  "artifactId" : "items-actor-plugin",
+  "uploadRepositories" : [ ],
+  "rawName" : "ItemsActorPlugin",
+  "version" : "0.1.0-SNAPSHOT"
+} ],
   "groupId" : "info.smart_tools.examples.items",
   "artifactId" : "items-feature",
   "rawName" : "ItemsFeature",

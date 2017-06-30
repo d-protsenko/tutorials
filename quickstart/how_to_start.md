@@ -208,7 +208,7 @@ Wrappers are interfaces to the data the Actor need access to or provides.
 
 Because our Actor has two handlers, we should define two wrappers: to get all items and to add a new item.
 
-Copy and rename `Items/ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/wrapper/ItemsActorWrapper.template` into `GetAllItemsWrapper.java` and `AddNewItemWrapper.java`.
+Copy and rename `ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/wrapper/ItemsActorWrapper.template` into `GetAllItemsWrapper.java` and `AddNewItemWrapper.java`.
 
 `GetAllItemsWrapper` is the interface with a method to set a list of items. These are data going _out_ of the Actor, so the Actor should _set_ the list to the processing message.
 
@@ -255,7 +255,7 @@ Note getters and setters of the Wrapper must throw `ReadValueException` and `Cha
 
 #### Write the Actor
 
-Take the file `Items/ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/ItemsActor.java` and modify it.
+Take the file `ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/ItemsActor.java` and modify it.
 
 It's necessary to add two methods: to retrieve all items and to add a new item. Each method takes one argument with the necessary Wrapper type and returns `void`. Each method throws the specific exception.
 
@@ -311,7 +311,7 @@ Note the Actor is just a Java class which uses some specific interfaces.
 It's possible to test it completely independently by mock implementations of the wrappers.
 You can use [Mockito](http://site.mockito.org/) for it.
 
-Modify `/home/gelin/work/7bits/smart-tools/tutorials/src/how_to_start/Items/ItemsFeature/ItemsActor/src/test/java/info/smart_tools/examples/items/items_feature/items_actor/ItemsActorTest.java`.
+Modify `ItemsFeature/ItemsActor/src/test/java/info/smart_tools/examples/items/items_feature/items_actor/ItemsActorTest.java`.
 
 ```java
 package info.smart_tools.examples.items.items_feature.items_actor;
@@ -374,7 +374,189 @@ Note `das` already added all dependencies necessary for the test.
 
 ### Create the Plugin
 
+A Plugin is necessary to make your actor available in the system IOC. Typically each Actor has a corresponding Plugin.
+
+Create the new Plugin, use `cpl` subcommand. The Plugin name is "ItemsActorPlugin". It's located in the "ItemsFeature".
+
+```console
+$ das cpl -pln ItemsActorPlugin -fn ItemsFeature
+Distributed Actor System. Design, assembly and deploy tools.
+Version 0.3.3.
+Creating plugin ...
+Plugin has been created successful.
+```
+
+The new folder "ItemsActorPlugin" is created under the Feature folder. Check it's content.
+
+```console
+$ ls ItemsFeature
+config.json  ItemsActor  ItemsActorPlugin  ItemsFeatureDistribution  pom.xml
+$ ls ItemsFeature/ItemsActorPlugin
+pom.xml  src
+```
+
+The new Maven module is created for the Plugin. This module is a submodule of the Feature.
+
+#### Write the Plugin code
+
+Modify `ItemsFeature/ItemsActorPlugin/src/main/java/info/smart_tools/examples/items/items_feature/items_actor_plugin/ItemsActorPlugin.java`. You should add a code to register a strategy of retrieving of your Actor instance from IOC. In this simplest case the strategy just creates a new instance when IOC is queried for the Actor. You must define the name of the Actor, how it's visible in IOC, "ItemsActor" in this case.
+
+```java
+package info.smart_tools.examples.items.items_feature.items_actor_plugin;
+
+import info.smart_tools.examples.items.items_feature.items_actor.ItemsActor;
+import info.smart_tools.smartactors.base.exception.invalid_argument_exception.InvalidArgumentException;
+import info.smart_tools.smartactors.base.interfaces.iaction.exception.FunctionExecutionException;
+import info.smart_tools.smartactors.base.strategy.apply_function_to_arguments.ApplyFunctionToArgumentsStrategy;
+import info.smart_tools.smartactors.feature_loading_system.bootstrap_plugin.BootstrapPlugin;
+import info.smart_tools.smartactors.feature_loading_system.interfaces.ibootstrap.IBootstrap;
+import info.smart_tools.smartactors.ioc.iioccontainer.exception.RegistrationException;
+import info.smart_tools.smartactors.ioc.iioccontainer.exception.ResolutionException;
+import info.smart_tools.smartactors.ioc.ioc.IOC;
+import info.smart_tools.smartactors.ioc.named_keys_storage.Keys;
+
+public class ItemsActorPlugin extends BootstrapPlugin {
+
+     /**
+     * Constructs the plugin.
+     * @param bootstrap the bootstrap instance
+     */
+    public ItemsActorPlugin(final IBootstrap bootstrap) {
+            super(bootstrap);
+    }
+
+    @Item("items-actor-plugin")     // the unique name of the plugin item, the items may depend on each other
+    public void init()
+            throws ResolutionException, RegistrationException, InvalidArgumentException {
+        IOC.register(
+                Keys.getOrAdd("ItemsActor"),    // the unique name of the actor in IOC
+                new ApplyFunctionToArgumentsStrategy(
+                        a -> {
+                            try {
+                                return new ItemsActor();
+                            } catch (Exception e) {
+                                throw new FunctionExecutionException(e);
+                            }
+                        }
+                )
+        );
+    }
+}
+```
+
+The Plugin Maven module depends on the Actor Maven module. So, add the dependency to `ItemsFeature/ItemsActorPlugin/pom.xml`.
+
+```xml
+        <dependency>
+            <groupId>info.smart_tools.examples.items</groupId>
+            <artifactId>items-feature.items-actor</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+```
+
+### Define the message Map
+
+How it's time to create the Config for the Feature. You should define the Actor, how to get it from IOC, and the message Map, the chain of actors to process the message.
+
+We define two Maps: one to get all items, another to add a new item. Our ItemsActor appears in both Maps, but the different handlers are used.
+
+For each Actor in the Map it's necessary to define mapping of the message fields to the Wrapper methods. Note, "in" parameters corresponds to getters in the Wrapper and transfers data _into_ the Actor, while "out" parameters corresponds to setters in the Wrapper and transfers data _out from_ the Actor. The "message/" prefix of the mapping values means we work with the fields of the Message passing between the Actors, also there are other context objects we don't touch in this example.
+
+Because our server will serve HTTP requests and it should return some responses, we add to the end of each Map the system Actor named "responseSender".
+
+The "exceptional" property for each Map defines how to process exceptions during the processing. Here it's empty array.
+
+Modify the config of the Feature: `ItemsFeature/config.json`.
+
+```json
+{
+  "featureName": "info.smart_tools.examples.items:items-feature",
+  "afterFeatures": [],
+  "objects": [
+    {
+      "name": "items-actor",
+      "kind": "actor",
+      "dependency": "ItemsActor"
+    }
+  ],
+  "maps": [
+    {
+      "id": "get-all-items",
+      "steps": [
+        {
+          "target": "items-actor",
+          "handler": "getAllItems",
+          "wrapper": {
+            "out_setAllItems": "message/items"
+          }
+        },
+        {
+          "target": "responseSender",
+          "handler": "sendResponse"
+        }
+      ],
+      "exceptional": [
+      ]
+    },
+    {
+      "id": "add-new-item",
+      "steps": [
+        {
+          "target": "items-actor",
+          "handler": "addNewItem",
+          "wrapper": {
+            "in_getNewItemName": "message/name"
+          }
+        },
+        {
+          "target": "responseSender",
+          "handler": "sendResponse"
+        }
+      ],
+      "exceptional": [
+      ]
+    }
+  ]
+}
+```
+
 ### Build the Feature
+
+Use `make` subcommand to build all the Features in the Project.
+
+```console
+$ das make
+make project
+[INFO] Scanning for projects...
+
+... many output from Maven
+
+[INFO] --- maven-assembly-plugin:3.0.0:single (default) @ items-feature-distribution ---
+[INFO] Reading assembly descriptor: bin.xml
+[INFO] Building zip: /home/gelin/work/7bits/smart-tools/tutorials/src/how_to_start/Items/project-distribution/items-feature-0.1.0-SNAPSHOT-archive.zip
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO]
+[INFO] items .............................................. SUCCESS [  0.570 s]
+[INFO] items-feature ...................................... SUCCESS [  0.016 s]
+[INFO] items-feature.items-actor .......................... SUCCESS [  3.652 s]
+[INFO] items-feature.items-actor-plugin ................... SUCCESS [  0.874 s]
+[INFO] items-feature-distribution ......................... SUCCESS [  0.802 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 6.149 s
+[INFO] Finished at: 2017-06-30T13:03:43+06:00
+[INFO] Final Memory: 22M/286M
+[INFO] ------------------------------------------------------------------------
+```
+
+The result are zip archives of the Features in "project-distribution" folder.
+
+```console
+$ ls project-distribution
+items-feature-0.1.0-SNAPSHOT-archive.zip
+```
 
 ## Run the Server
 
