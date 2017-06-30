@@ -11,12 +11,13 @@
   "maps": [
     {
       "id": "get-all-items",
+      "externalAccess": true,
       "steps": [
         {
           "target": "items-actor",
           "handler": "getAllItems",
           "wrapper": {
-            "out_setAllItems": "message/items"
+            "out_setAllItems": "response/items"
           }
         },
         {
@@ -28,6 +29,7 @@
     },
     {
       "id": "add-new-item",
+      "externalAccess": true,
       "steps": [
         {
           "target": "items-actor",

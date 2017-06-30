@@ -462,12 +462,6 @@ How it's time to create the Config for the Feature. You should define the Actor,
 
 We define two Maps: one to get all items, another to add a new item. Our ItemsActor appears in both Maps, but the different handlers are used.
 
-For each Actor in the Map it's necessary to define mapping of the message fields to the Wrapper methods. Note, "in" parameters corresponds to getters in the Wrapper and transfers data _into_ the Actor, while "out" parameters corresponds to setters in the Wrapper and transfers data _out from_ the Actor. The "message/" prefix of the mapping values means we work with the fields of the Message passing between the Actors, also there are other context objects we don't touch in this example.
-
-Because our server will serve HTTP requests and it should return some responses, we add to the end of each Map the system message receiver named "sendResponse".
-
-The "exceptional" property for each Map defines how to process exceptions during the processing. Here it's empty array.
-
 Modify the config of the Feature: `ItemsFeature/config.json`.
 
 ```json
@@ -484,12 +478,13 @@ Modify the config of the Feature: `ItemsFeature/config.json`.
   "maps": [
     {
       "id": "get-all-items",
+      "externalAccess": true,
       "steps": [
         {
           "target": "items-actor",
           "handler": "getAllItems",
           "wrapper": {
-            "out_setAllItems": "message/items"
+            "out_setAllItems": "response/items"
           }
         },
         {
@@ -501,6 +496,7 @@ Modify the config of the Feature: `ItemsFeature/config.json`.
     },
     {
       "id": "add-new-item",
+      "externalAccess": true,
       "steps": [
         {
           "target": "items-actor",
@@ -519,6 +515,18 @@ Modify the config of the Feature: `ItemsFeature/config.json`.
   ]
 }
 ```
+
+Because the Maps will serve external HTTP requests we explicitly allow external access to them with "externalAccess" property.
+
+For each Actor in the Map it's necessary to define mapping of the message fields to the Wrapper methods. Note, "out" parameters correspond to setters in the Wrapper and transfers data _out from_ the Actor, while "in" parameters correspond to getters in the Wrapper and transfers data _into_ the Actor.
+
+The "response/" prefix of the mapping values means we work with the response object, it'll pass back to the HTTP client and the end of the Map.
+
+The "message/" prefix of the mapping values means we work with the fields of the Message passing between the Actors, here the HTTP request comes in.
+
+Because our server will serve HTTP requests and it should return some responses, we add to the end of each Map the system message receiver named "sendResponse".
+
+The "exceptional" property for each Map defines how to process exceptions during the processing. Here it's empty array.
 
 ### Build the Feature
 
@@ -782,4 +790,32 @@ Go to the Server's folder and start it from the command line.
 $ cd ItemsServer
 $ java -jar server.jar
 
+```
+
+### Test the Server
+
+You server listens on port 9909 and receives POST requests. You must provide "messageMapId" in each request.
+
+```console
+$ curl -X POST http://localhost:9909/ \
+  -H 'content-type: application/json' \
+  -d '{
+    "messageMapId": "get-all-items"
+  }'
+{"items":[]}
+
+$ curl -X POST http://localhost:9909/ \
+  -H 'content-type: application/json' \
+  -d '{
+    "messageMapId": "add-new-item",
+    "name": "new item"
+}'
+{}
+
+$ curl -X POST http://localhost:9909/ \
+  -H 'content-type: application/json' \
+  -d '{
+    "messageMapId": "get-all-items"
+  }'
+{"items":["new item"]}
 ```
