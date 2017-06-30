@@ -77,7 +77,7 @@ and check the created server structure. It should be the following:
     |   | -- ..
     |-- features
     |   | -- ..
-     -- server-0.3.2.jar (the version of jar file can differs)
+     -- server-0.3.2.jar (version of jar file may differ)
 ```
 
 Use the command `dc` (download core) to download the core pack. This command supports the following arguments:

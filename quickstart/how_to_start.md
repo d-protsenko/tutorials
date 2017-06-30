@@ -560,11 +560,83 @@ items-feature-0.1.0-SNAPSHOT-archive.zip
 
 ## Run the Server
 
+It's time to deploy our feature to the Server.
+
+### Create the Server folder
+
+Go back to the initial folder outside of the Project hierarchy.
+
+Create here the folder of the Server. Use `cs` subcommand. The Server name is "ItemsServer".
+
+```console
+$ das cs -sn ItemsServer
+Distributed Actor System. Design, assembly and deploy tools.
+Version 0.3.3.
+Creating server ...
+Jun 30, 2017 1:26:38 PM org.hibernate.validator.internal.util.Version <clinit>
+INFO: HV000001: Hibernate Validator 5.1.2.Final
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+Server has been created successful.
+```
+
+The new folder "ItemsServer" is created. Check it's content.
+
+```console
+$ ls
+Items  ItemsServer
+$ ls ItemsServer
+configuration.json  core  corefeatures  features  server.jar
+```
+
+The `server.jar` is the main entry point for the Server.
+
+The `configuration.json` is the main configuration file of the Server.
+
 ### Download core
 
-### Define core Features
+Use subcommand `dc` to download core jars for the Server. Point the path to the Server folder.
+
+```console
+$ das dc -path ItemsServer
+Distributed Actor System. Design, assembly and deploy tools.
+Version 0.3.3.
+Download server core ...
+Jun 30, 2017 1:33:14 PM org.hibernate.validator.internal.util.Version <clinit>
+INFO: HV000001: Hibernate Validator 5.1.2.Final
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+Server core has been downloaded successful.
+```
+
+Now the Server's "core" folder contains downloaded core Features.
+
+```console
+$ ls ItemsServer/core
+base-0.3.3                           feature-management-0.3.3         iobject-plugins-0.3.3            message-processing-interfaces-0.3.3       task-plugins.non-blocking-queue-0.3.3
+configuration-manager-0.3.3          field-0.3.3                      ioc-0.3.3                        message-processing-plugins-0.3.3          utility-tools-0.3.3
+configuration-manager-plugins-0.3.3  field-plugins-0.3.3              ioc-plugins-0.3.3                on-feature-loading-service-starter-0.3.3
+core-service-starter-0.3.3           iobject-0.3.3                    ioc-strategy-pack-0.3.3          scope-0.3.3
+dumpable-interface-0.3.3             iobject-extension-0.3.3          ioc-strategy-pack-plugins-0.3.3  scope-plugins-0.3.3
+feature-loading-system-0.3.3         iobject-extension-plugins-0.3.3  message-processing-0.3.3         task-0.3.3
+```
 
 ### Add custom Features
 
+Copy the zip archive of the Feature you built to the "features" folder of the Server.
+
+```console
+$ cp Items/project-distribution/items-feature-0.1.0-SNAPSHOT-archive.zip ItemsServer/features
+```
+
 ### Run the Server
 
+Go to the Server's folder and start it from the command line.
+
+```console
+$ cd ItemsServer
+$ java -jar server.jar
+
+```
