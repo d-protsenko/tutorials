@@ -6,11 +6,6 @@
       "name": "items-actor",
       "kind": "actor",
       "dependency": "ItemsActor"
-    },
-    {
-      "name": "responseSender",
-      "kind": "stateless_actor",
-      "dependency": "ResponseSenderActor"
     }
   ],
   "maps": [
@@ -25,8 +20,7 @@
           }
         },
         {
-          "target": "responseSender",
-          "handler": "sendResponse"
+          "target": "sendResponse"
         }
       ],
       "exceptional": [
@@ -43,8 +37,7 @@
           }
         },
         {
-          "target": "responseSender",
-          "handler": "sendResponse"
+          "target": "sendResponse"
         }
       ],
       "exceptional": [

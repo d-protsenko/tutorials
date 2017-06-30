@@ -37,6 +37,8 @@ __Plugin__ — a part of a Feature, contains code to initialize the Feature, in 
 
 __IOC__, __Inversion of Control__, __IOC Container__ — global "storage" of all the objects in the system. The preferable way to take an object in the system is to ask IOC to resolve some parameters and get the object reference.
 
+__Message Receiver__, __Receiver__ — an entity in the system able to receive and process messages. Technically Actor is also such kind of entity, but Actors also support Wrappers and some thread-safety guarantees.
+
 ## Requirements
 
 You need Debian-base Linux distribution.
@@ -462,7 +464,7 @@ We define two Maps: one to get all items, another to add a new item. Our ItemsAc
 
 For each Actor in the Map it's necessary to define mapping of the message fields to the Wrapper methods. Note, "in" parameters corresponds to getters in the Wrapper and transfers data _into_ the Actor, while "out" parameters corresponds to setters in the Wrapper and transfers data _out from_ the Actor. The "message/" prefix of the mapping values means we work with the fields of the Message passing between the Actors, also there are other context objects we don't touch in this example.
 
-Because our server will serve HTTP requests and it should return some responses, we add to the end of each Map the system Actor named "responseSender". Also this actor must be listed in "objects". Note, it's better to register system actors in a separate configuration Feature single for the Project.
+Because our server will serve HTTP requests and it should return some responses, we add to the end of each Map the system message receiver named "sendResponse".
 
 The "exceptional" property for each Map defines how to process exceptions during the processing. Here it's empty array.
 
@@ -477,11 +479,6 @@ Modify the config of the Feature: `ItemsFeature/config.json`.
       "name": "items-actor",
       "kind": "actor",
       "dependency": "ItemsActor"
-    },
-    {
-      "name": "responseSender",
-      "kind": "stateless_actor",
-      "dependency": "ResponseSenderActor"
     }
   ],
   "maps": [
@@ -496,8 +493,7 @@ Modify the config of the Feature: `ItemsFeature/config.json`.
           }
         },
         {
-          "target": "responseSender",
-          "handler": "sendResponse"
+          "target": "sendResponse"
         }
       ],
       "exceptional": [
@@ -514,8 +510,7 @@ Modify the config of the Feature: `ItemsFeature/config.json`.
           }
         },
         {
-          "target": "responseSender",
-          "handler": "sendResponse"
+          "target": "sendResponse"
         }
       ],
       "exceptional": [
@@ -563,6 +558,96 @@ $ ls project-distribution
 items-feature-0.1.0-SNAPSHOT-archive.zip
 ```
 
+## Configure Endpoint
+
+You have to provide some configuration for the HTTP endpoint of the Server.
+
+Create the new Feature named "EndpointConfiguration".
+
+```console
+$ das cf -fn EndpointConfiguration
+Distributed Actor System. Design, assembly and deploy tools.
+Version 0.3.3.
+Creating feature ...
+Feature has been created successful.
+```
+
+This Feature contains only config file. Modify `EndpointConfiguration/config.json`.
+
+You should add some message receivers. "router" is to forward the incoming requests to specified message maps. "sendResponse" is to transfer the message back to the HTTP client.
+
+You should define the initial "routing_chain" where the HTTP requests starts processing.
+
+You should define the "endpoints" section with the TCP port the server will listen on and some other parameters.
+
+```json
+{
+  "featureName": "info.smart_tools.examples.items:endpoint-configuration",
+  "afterFeatures": [],
+  "objects": [
+    {
+      "name": "router"
+      "kind": "raw",
+      "dependency": "info.smart_tools.smartactors.message_processing.chain_call_receiver.ChainCallReceiver",
+      "strategyDependency": "chain choice strategy"
+    },
+    {
+      "name": "sendResponse",
+      "kind": "raw",
+      "dependency": "response sender receiver"
+    }
+  ],
+  "maps": [
+    {
+      "id": "routing_chain",
+      "steps": [
+        {
+          "target": "router"
+        }
+      ],
+      "exceptional": [
+      ]
+    }
+  ],
+  "endpoints": [
+    {
+      "name": "mainHttpEp",
+      "type": "http",
+      "port": 9909,
+      "startChain": "routing_chain",
+      "maxContentLength": 4098,
+      "stackDepth": 5
+    }
+  ]
+}
+```
+
+Build all Features with `das`.
+
+```console
+$ das make
+make project
+
+... many output from Maven ...
+
+[INFO] Reactor Summary:
+[INFO]
+[INFO] items .............................................. SUCCESS [  0.503 s]
+[INFO] items-feature ...................................... SUCCESS [  0.015 s]
+[INFO] items-feature.items-actor .......................... SUCCESS [  3.506 s]
+[INFO] items-feature.items-actor-plugin ................... SUCCESS [  0.920 s]
+[INFO] items-feature-distribution ......................... SUCCESS [  1.010 s]
+[INFO] endpoint-configuration ............................. SUCCESS [  0.008 s]
+[INFO] endpoint-configuration-distribution ................ SUCCESS [  0.085 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 6.304 s
+[INFO] Finished at: 2017-06-30T17:17:18+06:00
+[INFO] Final Memory: 24M/322M
+[INFO] ------------------------------------------------------------------------
+```
+
 ## Run the Server
 
 It's time to deploy our feature to the Server.
@@ -608,7 +693,7 @@ Download server core ...
 Server core has been downloaded successful.
 ```
 
-Now the Server's "core" folder contains downloaded core Features.
+Now the Server's "core" folder contains downloaded core libraries.
 
 ```console
 $ ls ItemsServer/core
@@ -622,20 +707,71 @@ feature-loading-system-0.3.3         iobject-extension-plugins-0.3.3  message-pr
 
 ### Add core Features
 
-We want our server to receive HTTP requests and reply with a response. So we need to add "http-endpoint" core Feature and it's dependencies. This Feature contains the definition of "response-sender" actor.
+We want our server to receive HTTP requests and reply with a response. So we need to add "http-endpoint" core Feature and it's dependencies.
 
 Where to download the core Features and ids of their artifacts must be listed in `ItemsServer/corefeatures/features.json` file. Create this file.
 
 ```json
-
+{
+  "repositories": [
+    {
+      "repositoryId": "archiva.smartactors-features",
+      "type": "default",
+      "url": "http://archiva.smart-tools.info/repository/smartactors-features/"
+    }
+  ],
+  "features": [
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "http-endpoint",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "http-endpoint-plugins",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "endpoint",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "endpoint-plugins",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "endpoint-service-starter",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "message-bus",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "message-bus-service-starter",
+      "version": "0.3.3"
+    }
+  ]
+}
 ```
+
+The server will download all listed Features during it's start.
+
+Currently the server cannot download dependencies of the Features. So you have to list in `features.json` not only "http-endpoint", but also it's dependencies: "endpoint" and "message-bus", and some additional Features with the names ending with "-plugins" and "-service-starter".
 
 ### Add custom Features
 
-Copy the zip archive of the Feature you built to the "features" folder of the Server.
+Copy the zip archives of the Feature you built to the "features" folder of the Server.
 
 ```console
-$ cp Items/project-distribution/items-feature-0.1.0-SNAPSHOT-archive.zip ItemsServer/features
+$ cp Items/project-distribution/*.zip ItemsServer/features
+$ ls ItemsServer/features
+endpoint-configuration-0.1.0-SNAPSHOT-archive.zip  items-feature-0.1.0-SNAPSHOT-archive.zip
 ```
 
 ### Run the Server

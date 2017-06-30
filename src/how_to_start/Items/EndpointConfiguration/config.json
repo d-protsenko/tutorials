@@ -1,0 +1,39 @@
+{
+  "featureName": "info.smart_tools.examples.items:endpoint-configuration",
+  "afterFeatures": [],
+  "objects": [
+    {
+      "name": "router",
+      "kind": "raw",
+      "dependency": "info.smart_tools.smartactors.message_processing.chain_call_receiver.ChainCallReceiver",
+      "strategyDependency": "chain choice strategy"
+    },
+    {
+      "name": "sendResponse",
+      "kind": "raw",
+      "dependency": "response sender receiver"
+    }
+  ],
+  "maps": [
+    {
+      "id": "routing_chain",
+      "steps": [
+        {
+          "target": "router"
+        }
+      ],
+      "exceptional": [
+      ]
+    }
+  ],
+  "endpoints": [
+    {
+      "name": "mainHttpEp",
+      "type": "http",
+      "port": 9909,
+      "startChain": "routing_chain",
+      "maxContentLength": 4098,
+      "stackDepth": 5
+    }
+  ]
+}

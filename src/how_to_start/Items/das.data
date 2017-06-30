@@ -17,6 +17,14 @@
   "artifactId" : "items-feature",
   "rawName" : "ItemsFeature",
   "version" : "0.1.0-SNAPSHOT"
+}, {
+  "actors" : [ ],
+  "uploadRepositories" : [ ],
+  "plugins" : [ ],
+  "groupId" : "info.smart_tools.examples.items",
+  "artifactId" : "endpoint-configuration",
+  "rawName" : "EndpointConfiguration",
+  "version" : "0.1.0-SNAPSHOT"
 } ],
   "on-actor-creation-upload-repositories" : [ ],
   "on-feature-creation-upload-repositories" : [ ],
