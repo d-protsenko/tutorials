@@ -807,34 +807,46 @@ $ java -jar server.jar
 [OK] Stage 1: server core has been loaded successful.
 
 
-[INFO] Start downloading feature - 'http-endpoint-plugins'.
-[INFO] Start downloading feature - 'http-endpoint'.
 [INFO] Start downloading feature - 'message-bus'.
-[INFO] Start downloading feature - 'endpoint-plugins'.
-[OK] -------------- Feature 'endpoint-plugins' has been downloaded successful.
-[OK] -------------- Feature 'message-bus' has been downloaded successful.
-[INFO] Start downloading feature - 'endpoint-service-starter'.
+[INFO] Start downloading feature - 'http-endpoint-plugins'.
 [INFO] Start downloading feature - 'endpoint'.
+[INFO] Start downloading feature - 'timer'.
+[OK] -------------- Feature 'timer' has been downloaded successful.
+[INFO] Start downloading feature - 'timer-plugins'.
 [OK] -------------- Feature 'http-endpoint-plugins' has been downloaded successful.
+[INFO] Start downloading feature - 'http-endpoint'.
+[OK] -------------- Feature 'message-bus' has been downloaded successful.
 [INFO] Start downloading feature - 'message-bus-service-starter'.
+[OK] -------------- Feature 'timer-plugins' has been downloaded successful.
+[INFO] Start downloading feature - 'endpoint-service-starter'.
 [OK] -------------- Feature 'message-bus-service-starter' has been downloaded successful.
+[INFO] Start downloading feature - 'endpoint-plugins'.
 [OK] -------------- Feature 'endpoint-service-starter' has been downloaded successful.
-[INFO] Start unzipping feature - 'message-bus'.
+[INFO] Start unzipping feature - 'timer'.
+[OK] -------------- Feature 'endpoint-plugins' has been downloaded successful.
 [INFO] Start unzipping feature - 'http-endpoint-plugins'.
 [OK] -------------- Feature 'http-endpoint-plugins' has been unzipped successful.
+[INFO] Start unzipping feature - 'message-bus'.
+[OK] -------------- Feature 'timer' has been unzipped successful.
+[INFO] Start unzipping feature - 'timer-plugins'.
 [OK] -------------- Feature 'message-bus' has been unzipped successful.
 [INFO] Start unzipping feature - 'message-bus-service-starter'.
-[INFO] Start unzipping feature - 'endpoint-service-starter'.
-[OK] -------------- Feature 'endpoint-service-starter' has been unzipped successful.
 [OK] -------------- Feature 'message-bus-service-starter' has been unzipped successful.
+[OK] -------------- Feature 'timer-plugins' has been unzipped successful.
+[INFO] Start unzipping feature - 'endpoint-service-starter'.
 [INFO] Start unzipping feature - 'endpoint-plugins'.
-[INFO] Start loading feature - 'endpoint-service-starter'.
+[OK] -------------- Feature 'endpoint-service-starter' has been unzipped successful.
+[INFO] Start loading feature - 'timer'.
 [OK] -------------- Feature 'endpoint-plugins' has been unzipped successful.
 [INFO] Start loading feature - 'message-bus-service-starter'.
 [OK] -------------- Feature - 'info.smart_tools.smartactors:message-bus-service-starter' has been loaded successful.
+[INFO] Start loading feature - 'endpoint-service-starter'.
+[OK] -------------- Feature - 'info.smart_tools.smartactors:timer' has been loaded successful.
 [INFO] Start loading feature - 'message-bus'.
 [OK] -------------- Feature - 'info.smart_tools.smartactors:endpoint-service-starter' has been loaded successful.
+[INFO] Start loading feature - 'timer-plugins'.
 [OK] -------------- Feature - 'info.smart_tools.smartactors:message-bus' has been loaded successful.
+[OK] -------------- Feature - 'info.smart_tools.smartactors:timer-plugins' has been loaded successful.
 [OK] -------------- Feature 'endpoint' has been downloaded successful.
 [INFO] Start unzipping feature - 'endpoint'.
 [OK] -------------- Feature 'endpoint' has been unzipped successful.
@@ -848,23 +860,19 @@ $ java -jar server.jar
 [OK] -------------- Feature - 'info.smart_tools.smartactors:endpoint-plugins' has been loaded successful.
 [OK] -------------- Feature - 'info.smart_tools.smartactors:http-endpoint' has been loaded successful.
 [INFO] Start loading feature - 'http-endpoint-plugins'.
-[FAILED] ---------- Feature 'info.smart_tools.smartactors:http-endpoint-plugins' loading has been broken with exception:
-info.smart_tools.smartactors.feature_loading_system.interfaces.ibootstrap.exception.ProcessExecutionException:
-
-Error occurred processing item "CreateHttpClient".
-Processed items are: actor:http_request_sender, response, response_content_strategy, EndpointPlugin, CreateHttpEndpoint.
-All items are: actor:http_request_sender, response, response_content_strategy, EndpointPlugin, CreateHttpEndpoint, CreateHttpClient, GetHeaderFromRequestRulePlugin, GetCookieFromRequestRulePlugin, GetQueryParameterFromRequestRulePlugin
-
+[OK] -------------- Feature - 'info.smart_tools.smartactors:http-endpoint-plugins' has been loaded successful.
 
 
 [INFO] Feature group has been loaded: [
 info.smart_tools.smartactors:message-bus - (OK),
-info.smart_tools.smartactors:http-endpoint-plugins - (Failed),
-info.smart_tools.smartactors:http-endpoint - (OK),
-info.smart_tools.smartactors:endpoint-plugins - (OK),
-info.smart_tools.smartactors:endpoint-service-starter - (OK),
+info.smart_tools.smartactors:http-endpoint-plugins - (OK),
 info.smart_tools.smartactors:endpoint - (OK),
-info.smart_tools.smartactors:message-bus-service-starter - (OK)]
+info.smart_tools.smartactors:timer - (OK),
+info.smart_tools.smartactors:timer-plugins - (OK),
+info.smart_tools.smartactors:http-endpoint - (OK),
+info.smart_tools.smartactors:message-bus-service-starter - (OK),
+info.smart_tools.smartactors:endpoint-service-starter - (OK),
+info.smart_tools.smartactors:endpoint-plugins - (OK)]
 
 
 [INFO] Start unzipping feature - 'endpoint-configuration'.
@@ -878,8 +886,8 @@ info.smart_tools.smartactors:message-bus-service-starter - (OK)]
 
 
 [INFO] Feature group has been loaded: [
-info.smart_tools.examples.items:items-feature - (OK),
-info.smart_tools.examples.items:endpoint-configuration - (OK)]
+info.smart_tools.examples.items:endpoint-configuration - (OK),
+info.smart_tools.examples.items:items-feature - (OK)]
 ```
 
 ### Test the Server
