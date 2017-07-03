@@ -765,6 +765,16 @@ Where to download the core Features and ids of their artifacts must be listed in
       "group": "info.smart_tools.smartactors",
       "name": "message-bus-service-starter",
       "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "timer",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "timer-plugins",
+      "version": "0.3.3"
     }
   ]
 }
@@ -772,7 +782,7 @@ Where to download the core Features and ids of their artifacts must be listed in
 
 The server will download all listed Features during it's start.
 
-Currently the server cannot download dependencies of the Features. So you have to list in `features.json` not only "http-endpoint", but also it's dependencies: "endpoint" and "message-bus", and some additional Features with the names ending with "-plugins" and "-service-starter".
+Currently the server cannot download dependencies of the Features. So you have to list in `features.json` not only "http-endpoint", but also it's dependencies: "endpoint", "message-bus" and "timer", and some additional Features with the names ending with "-plugins" and "-service-starter".
 
 ### Add custom Features
 
