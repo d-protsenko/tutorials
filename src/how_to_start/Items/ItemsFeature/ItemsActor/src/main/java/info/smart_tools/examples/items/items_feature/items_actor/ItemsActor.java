@@ -28,7 +28,7 @@ public class ItemsActor {
     }
 
     /**
-     * Add the new item to the list.
+     * Adds the new item to the list.
      * @param wrapper the wrapper where to get the name of the new item
      * @throws ItemsActorException if something goes wrong
      */

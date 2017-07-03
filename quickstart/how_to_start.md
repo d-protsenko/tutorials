@@ -33,11 +33,13 @@ __Config__ — a `config.json` file, a part of a Feature. Configs from all loade
 
 __Map__, __Message Map__, __Chain__ — the list of actors in the specified order to process a message step by step. On each step the message is wrapped and passed to the Actor's handler, the Actor makes some modifications in the message atomically, then the message is passed to the next Actor. This is the core idea, how independent Actors work together.
 
-__Plugin__ — a part of a Feature, contains code to initialize the Feature, in most cases registers new strategies to IOC. Plugins may depend on other plugins.
+__Plugin__ — a part of a Feature, contains code to initialize the Feature, in most cases registers new strategies in IOC. Plugins may depend on other plugins.
 
-__IOC__, __Inversion of Control__, __IOC Container__ — global "storage" of all the objects in the system. The preferable way to take an object in the system is to ask IOC to resolve some parameters and get the object reference.
+__IOC__, __Inversion of Control__, __IOC Container__ — global "storage" of all objects in the system. The preferable way to take an object in the system is to ask IOC to resolve some parameters and get the object reference.
 
 __Message Receiver__, __Receiver__ — an entity in the system able to receive and process messages. Technically Actor is also such kind of entity, but Actors also support Wrappers and some thread-safety guarantees.
+
+__Endpoint__ — point of the server to receive incoming messages, for HTTP it's a TCP port accepting POSTed JSON documents.
 
 ## Requirements
 
@@ -45,7 +47,7 @@ You need Debian-base Linux distribution.
 
 You need [OpenJDK](http://openjdk.java.net/install/index.html) 8 or later to run and compile. Note you need `jdk` packages, not `jre`.
 
-You need [Apache Maven](https://maven.apache.org/install.html) 3 or later to build your project.
+You need [Apache Maven](https://maven.apache.org/install.html) 3 or later to build your Project.
 
 You need access to http://archiva.smart-tools.info to download necessary packages.
 
@@ -96,7 +98,7 @@ das.data  pom.xml
 
 `das.data` file contains some metadata necessary for `das` utility to work correctly.
 
-`pom.xml` file is the Maven parent module for your project.
+`pom.xml` file is the Maven parent module for your Project.
 
 ### Create the Feature
 
@@ -133,7 +135,7 @@ The Feature is another Maven module with it's own `pom.xml`.
 
 "ItemsFeatureDistribution" folder contains another Maven module necessary to build zip archive for the Feature. `bin.xml` contains instructions to Maven plugins how to zip.
 
-Note that Project's `pom.xml` references Feature's `pom.xml` as a submodule. And Feature references Distribution.
+Note that Project's `pom.xml` references Feature's `pom.xml` as a submodule. And also Feature references Distribution.
 
 ### Create the Actor
 
@@ -175,11 +177,11 @@ It's time to open the whole Project in your IDE. Open the `pom.xml` in the Proje
 Our Actor will keep the list of items in memory (as it's private field) and gives access to the list.
 It'll have two handlers (methods): to retrieve the whole list and to add a new item.
 
-Note in this case the Actor is the owner of the items list. All operations over the list should be performed through this Actor.
+Note in this case the Actor is the _owner_ of the items list. All operations over the list should be performed through this Actor.
 
 #### Write exceptions
 
-Typically each actor has it's own exception type throwing from its methods.
+Typically each actor has it's own exception type thrown from its methods.
 
 Rename `ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/exception/ItemsActorException.template` into `ItemsActorException.java` and fill it with the content.
 
@@ -212,7 +214,7 @@ Because our Actor has two handlers, we should define two wrappers: to get all it
 
 Copy and rename `ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/wrapper/ItemsActorWrapper.template` into `GetAllItemsWrapper.java` and `AddNewItemWrapper.java`.
 
-`GetAllItemsWrapper` is the interface with a method to set a list of items. These are data going _out_ of the Actor, so the Actor should _set_ the list to the processing message.
+`GetAllItemsWrapper` is the interface with a method to set a list of items. These are data going _out from_ the Actor, so the Actor should _set_ the list to the processing message.
 
 ```java
 package info.smart_tools.examples.items.items_feature.items_actor.wrapper;
@@ -292,7 +294,7 @@ public class ItemsActor {
     }
 
     /**
-     * Add the new item to the list.
+     * Adds the new item to the list.
      * @param wrapper the wrapper where to get the name of the new item
      * @throws ItemsActorException if something goes wrong
      */
@@ -520,7 +522,7 @@ Because the Maps will serve external HTTP requests we explicitly allow external 
 
 For each Actor in the Map it's necessary to define mapping of the message fields to the Wrapper methods. Note, "out" parameters correspond to setters in the Wrapper and transfers data _out from_ the Actor, while "in" parameters correspond to getters in the Wrapper and transfers data _into_ the Actor.
 
-The "response/" prefix of the mapping values means we work with the response object, it'll pass back to the HTTP client and the end of the Map.
+The "response/" prefix of the mapping values means we work with the response object, it'll pass back to the HTTP client at the end of the Map.
 
 The "message/" prefix of the mapping values means we work with the fields of the Message passing between the Actors, here the HTTP request comes in.
 
@@ -559,7 +561,7 @@ make project
 [INFO] ------------------------------------------------------------------------
 ```
 
-The result are zip archives of the Features in "project-distribution" folder.
+The result is zip archives of the Features in "project-distribution" folder.
 
 ```console
 $ ls project-distribution
@@ -581,12 +583,6 @@ Feature has been created successful.
 ```
 
 This Feature contains only config file. Modify `EndpointConfiguration/config.json`.
-
-You should add some message receivers. "router" is to forward the incoming requests to specified message maps. "sendResponse" is to transfer the message back to the HTTP client.
-
-You should define the initial "routing_chain" where the HTTP requests starts processing.
-
-You should define the "endpoints" section with the TCP port the server will listen on and some other parameters.
 
 ```json
 {
@@ -630,6 +626,12 @@ You should define the "endpoints" section with the TCP port the server will list
 }
 ```
 
+You should add some message receivers. "router" is to forward the incoming requests to specified message maps. "sendResponse" is to transfer the message back to the HTTP client.
+
+You should define the initial "routing_chain" where the HTTP requests start processing.
+
+You should define the "endpoints" section with the TCP port the server will listen on and some other parameters.
+
 Build all Features with `das`.
 
 ```console
@@ -658,7 +660,7 @@ make project
 
 ## Run the Server
 
-It's time to deploy our feature to the Server.
+It's time to deploy our Features to the Server.
 
 ### Create the Server folder
 
@@ -774,7 +776,7 @@ Currently the server cannot download dependencies of the Features. So you have t
 
 ### Add custom Features
 
-Copy the zip archives of the Feature you built to the "features" folder of the Server.
+Copy the zip archives of the Features you built to the "features" folder of the Server.
 
 ```console
 $ cp Items/project-distribution/*.zip ItemsServer/features
@@ -872,7 +874,7 @@ info.smart_tools.examples.items:endpoint-configuration - (OK)]
 
 ### Test the Server
 
-You server listens on port 9909 and receives POST requests. You must provide "messageMapId" in each request.
+Our server listens on port 9909 and receives POST requests. You must provide "messageMapId" in each request.
 
 ```console
 $ curl -X POST http://localhost:9909/ \
@@ -897,3 +899,5 @@ $ curl -X POST http://localhost:9909/ \
   }'
 {"items":["new item"]}
 ```
+
+You see the server accepts a POSTed JSON document as an incoming message. This message is passed to the Map defined in "messageMapId" property. The response, created in the Map is returned as a JSON body.
