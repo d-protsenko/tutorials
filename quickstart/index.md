@@ -13,6 +13,8 @@ group: quickstart
 
 [Project structure](project_structure.md)
 
+[How to connect to PostgreSQL](postgresql_setup)
+
 ## Basics
 
 [How to use IOC](IOCExample.html)
