@@ -66,9 +66,9 @@ ServerParts/features
 To specify the way of building system strictly we will use `Makefile`. Do not use instructions in the readme, because you'll definitely reach instructions-hell.
 
 ```make
-all: downloadDependencies start
+all: downloadCore start
 
-downloadDependencies:
+downloadCore:
 	cd ServerParts && das dc
 
 build:
@@ -77,10 +77,19 @@ build:
 run:
 	cd ServerParts && java -jar server.jar
 
+runDebug:
+  cd ServerParts && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -jar server.jar
+
 copyFeatures:
 	mkdir -p ServerParts/features && cp Features/project-distribution/*.zip ServerParts/features
 
-start: build copyFeatures run
+clean:
+  rm -rf ServerParts/corefeatures/*/
+  rm -rf ServerParts/features/*/
+
+start: clean build copyFeatures run
+
+startDebug: clean build copyFeatures runDebug
 ```
 
 Thus, when you download a repo first time, you have to run only `make`. To just start the server run `make start`.
