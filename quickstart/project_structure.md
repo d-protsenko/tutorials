@@ -78,14 +78,14 @@ run:
 	cd ServerParts && java -jar server.jar
 
 runDebug:
-  cd ServerParts && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -jar server.jar
+	cd ServerParts && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -jar server.jar
 
 copyFeatures:
 	mkdir -p ServerParts/features && cp Features/project-distribution/*.zip ServerParts/features
 
 clean:
-  rm -rf ServerParts/corefeatures/*/
-  rm -rf ServerParts/features/*/
+	rm -rf ServerParts/corefeatures/*/
+	rm -rf ServerParts/features/*/
 
 start: clean build copyFeatures run
 
