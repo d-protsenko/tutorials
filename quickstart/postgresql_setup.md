@@ -26,7 +26,7 @@ Create your custom feature, for example `SetupPostgresConnectionOptions`. We wil
 {
   "featureName": "com.my-project:setup-postgres-connection-options",
   "afterFeatures": [
-        "info.smart_tools.smartactors:create-postgres-collection-if-not-exists-feature"
+        "info.smart_tools.smartactors:database-postgresql-connection-options"
   ],
   "onFeatureLoading": [
     {
@@ -57,7 +57,7 @@ To use it, create a new feature, for example `CreateCollections` and fill the `c
 {
   "featureName": "com.my-project:create-collections",
   "afterFeatures": [
-    "info.smart_tools.smartactors:create-postgres-collection-if-not-exists-feature",
+    "info.smart_tools.smartactors:database-postgresql-create-collection-if-not-exists",
     "com.my-project:setup-postgres-connection-options"
   ],
   "onFeatureLoading": [
