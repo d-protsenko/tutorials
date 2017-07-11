@@ -79,3 +79,26 @@ You can see, that this feature allows us to send messages to the some inner chai
 You can specify as many messages in `messages` section as many collections you need.
 
 Best practises: add this messages in every feature, that need this collection. Do not create a single feature that creates everything. Here we do this just for education purposes.
+
+## How to use it?
+
+You have registered options and created collections. How to use them?
+
+To do database tasks you need to have an `IPool` object, to get it use this snippet:
+
+```java
+final ConnectionOptions options = IOC.resolve(Keys.getOrAdd(message.getConnectionOptionsRegistrationName()));
+final IPool pool = IOC.resolve(Keys.getOrAdd("PostgresConnectionPool"), options);
+String collectionName = message.getCollectionName();
+try (PoolGuard guard = new PoolGuard(pool)) {
+    ITask task = IOC.resolve(
+            Keys.getOrAdd(SOME_TASK_ID),
+            guard.getObject(),
+            collectionName,
+            message.getOptions()
+    );
+    task.execute();
+} catch (TaskExecutionException | ResolutionException | PoolGuardException e) {
+    throw new CreateCollectionActorException(e);
+}
+```
