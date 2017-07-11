@@ -30,7 +30,7 @@ Create your custom feature, for example `SetupPostgresConnectionOptions`. We wil
   ],
   "onFeatureLoading": [
     {
-      "chain": "registerPostgresConnectionOptions",
+      "chain": "registerPostgresJsonConnectionOptions",
       "messages": [
         {
           "connectionOptionsRegistrationName": "MyConnectionOptions",
