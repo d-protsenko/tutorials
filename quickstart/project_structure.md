@@ -7,7 +7,7 @@ group: quickstart
 
 # Project structure
 
-_Before reading this guide, look through this instructions: [How to start using SmartActors](how_to_start.md)_
+_Before reading this guide, look through this instructions: [How to start using SmartActors](how_to_start)_
 
 ## Dirs structure
 

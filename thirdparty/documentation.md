@@ -15,7 +15,7 @@ We recommend to use simple markdown documentation for each actor and chain. For 
 
 Download it **[here](https://github.com/7bits/doc_builder/releases)**
 
-First of all check whether your project corresponds to [the canonical project structure]({{"/quickstart/project_structure.md" | relative_url}}) or not.
+First of all check whether your project corresponds to [the canonical project structure]({{"/quickstart/project_structure" | relative_url}}) or not.
 
 In every feature you coulds create a special file `doc.md`. When you run in the project root the doc-builder it compiles all markdowns to the static html site that you could deploy.
 

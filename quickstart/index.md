@@ -9,35 +9,35 @@ group: quickstart
 
 ## Start
 
-[How to start using SmartActors](how_to_start.md)
+[How to start using SmartActors](how_to_start)
 
-[Project structure](project_structure.md)
+[Project structure](project_structure)
 
 [How to connect to PostgreSQL](postgresql_setup)
 
 ## Basics
 
-[How to use IOC](IOCExample.html)
+[How to use IOC](IOCExample)
 
-[How to use Scopes](ScopeExample.html)
+[How to use Scopes](ScopeExample)
 
-[How to use IObject](IObjectExample.html)
+[How to use IObject](IObjectExample)
 
-[How to use Wrappers](WrapperExample.html)
+[How to use Wrappers](WrapperExample)
 
-[How to work with database collections](DBCollectionExample.html)
+[How to work with database collections](DBCollectionExample)
 
 ## Developing application
 
-[How to write Actor](ActorExample.html)
+[How to write Actor](ActorExample)
 
 How to write Message Map (TDB)
 
 ## Developing server
 
-[How to use Plugins](PluginExample.html)
+[How to use Plugins](PluginExample)
 
-[How to use Features](FeatureExample.html)
+[How to use Features](FeatureExample)
 
 ## Testing
 

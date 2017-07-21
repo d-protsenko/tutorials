@@ -9,7 +9,7 @@ group: quickstart
 
 ## Overview
 
-Scope is a key-value storage, where system [service locators]((https://en.wikipedia.org/wiki/Service_locator_pattern)) like [IoC](IOCExample.html) are able to store their internal data.
+Scope is a key-value storage, where system [service locators]((https://en.wikipedia.org/wiki/Service_locator_pattern)) like [IoC](IOCExample) are able to store their internal data.
 
 ### Requirement for the keys
 
