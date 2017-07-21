@@ -38,3 +38,8 @@ How to write Message Map (TDB)
 [How to use Plugins](PluginExample.html)
 
 [How to use Features](FeatureExample.html)
+
+## Testing
+
+[How to unit test](how_to_unit_test)
+[How to test API](how_to_test_api)
