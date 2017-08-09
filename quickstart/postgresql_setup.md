@@ -141,7 +141,7 @@ You can specify as many messages in `messages` section as many collections you n
 
 Best practises: add this messages in every feature, that need this collection. Do not create a single feature that creates everything. Here we do this just for education purposes.
 
-### Aware
+### Warning!!
 
 Do not combine `onFeatureLoading` and `database` sections, because there is no garantee of execution order. Always create a feature with connection options and a separate feature for working with this connection options.
 
@@ -152,7 +152,7 @@ You have registered options and created collections. How to use them?
 To do database tasks you need to have an `IPool` object, to get it use this snippet:
 
 ```java
-final ConnectionOptions options = IOC.resolve(Keys.getOrAdd("PostgresConnectionOptions"));
+final ConnectionOptions options = IOC.resolve(Keys.getOrAdd("PostgresConnectionOptions")); // you can get this key from message for example!!
 final IPool pool = IOC.resolve(Keys.getOrAdd("PostgresConnectionPool"), options);
 String collectionName = "example_collection_1";
 try (PoolGuard guard = new PoolGuard(pool)) {

@@ -12,6 +12,7 @@ VERSION: 0.3.3
 ASSET_PATH: false
 
 # Build settings
+markdown_ext: "md"
 markdown: kramdown
 kramdown:
   input: GFM
@@ -30,3 +31,6 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
+
+keep_files:
+  - src/
