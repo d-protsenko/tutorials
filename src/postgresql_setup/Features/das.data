@@ -1,0 +1,25 @@
+{
+  "features" : [ {
+  "actors" : [ ],
+  "uploadRepositories" : [ ],
+  "plugins" : [ ],
+  "groupId" : "com.my-project",
+  "artifactId" : "create-collections",
+  "rawName" : "CreateCollections",
+  "version" : "0.1.0-SNAPSHOT"
+}, {
+  "actors" : [ ],
+  "uploadRepositories" : [ ],
+  "plugins" : [ ],
+  "groupId" : "com.my-project",
+  "artifactId" : "setup-postgres-connection-options",
+  "rawName" : "SetupPostgresConnectionOptions",
+  "version" : "0.1.0-SNAPSHOT"
+} ],
+  "on-actor-creation-upload-repositories" : [ ],
+  "on-feature-creation-upload-repositories" : [ ],
+  "on-plugin-creation-upload-repositories" : [ ],
+  "groupId" : "com.my-project",
+  "name" : "Features",
+  "version" : "0.1.0-SNAPSHOT"
+}

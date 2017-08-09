@@ -1,0 +1,27 @@
+{
+  "featureName": "com.my-project:create-collections",
+  "afterFeatures": [
+    "com.my-project:setup-postgres-connection-options",
+    "info.smart_tools.smartactors:database-postgresql-create-collection-if-not-exists"
+  ],
+  "onFeatureLoading": [
+    {
+      "chain": "createCollections",
+      "messages": [
+        {
+          "collectionName": "example_collection_1",
+          "connectionOptionsRegistrationName": "PostgresConnectionOptions"
+        }
+      ]
+    },
+    {
+      "chain": "createCollections",
+      "messages": [
+        {
+          "collectionName": "example_collection_2",
+          "connectionOptionsRegistrationName": "PostgresConnectionOptions"
+        }
+      ]
+    }
+  ]
+}

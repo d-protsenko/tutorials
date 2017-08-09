@@ -1,0 +1,18 @@
+{
+  "featureName": "com.my-project:setup-postgres-connection-options",
+  "afterFeatures": [
+    "info.smart_tools.smartactors:database-postgresql-plugins"
+  ],
+  "database": [
+    {
+      "key": "PostgresConnectionOptions",
+      "type": "PostgresConnectionOptionsStrategy",
+      "config": {
+        "url": "jdbc:postgresql://localhost:5432/example",
+        "username": "example",
+        "password": "example",
+        "maxConnections": 20
+      }
+    }
+  ]
+}

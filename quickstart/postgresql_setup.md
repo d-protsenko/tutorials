@@ -16,7 +16,61 @@ To start using database, especially PostgreSQL in your project you have to add t
 - database-postgresql
 - database-postgresql-plugins
 - database-postgresql-connection-options
+- database-service-starter
 - database-postgresql-create-collection-if-not-exists
+
+For example, your `corefeatures/features.json` could look like:
+
+```json
+{
+  "repositories": [
+    {
+      "repositoryId": "archiva.smartactors-features",
+      "type": "default",
+      "url": "http://archiva.smart-tools.info/repository/smartactors-features/"
+    },
+    {
+      "repositoryId": "archiva.common-features",
+      "type": "default",
+      "url": "http://archiva.smart-tools.info/repository/common-features/"
+    }
+  ],
+  "features": [
+    ...Some Other Features...
+    !!!
+    {
+      "group":"info.smart_tools.smartactors",
+      "name": "database-service-starter",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "database",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "database-plugins",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "database-postgresql",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "database-postgresql-plugins",
+      "version": "0.3.3"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "database-postgresql-create-collection-if-not-exists",
+      "version": "0.3.3"
+    }
+  ]
+}
+```
 
 ## Configurations
 
@@ -26,26 +80,24 @@ Create your custom feature, for example `SetupPostgresConnectionOptions`. We wil
 {
   "featureName": "com.my-project:setup-postgres-connection-options",
   "afterFeatures": [
-        "info.smart_tools.smartactors:database-postgresql-connection-options"
+    "info.smart_tools.smartactors:database-postgresql-plugins"
   ],
-  "onFeatureLoading": [
+  "database": [
     {
-      "chain": "registerPostgresJsonConnectionOptions",
-      "messages": [
-        {
-          "connectionOptionsRegistrationName": "MyConnectionOptions",
-          "url": "jdbc:postgresql://localhost:5432/example",
-          "username": "example",
-          "password": "example",
-          "maxConnections": 250
-        }
-      ]
+      "key": "PostgresConnectionOptions",
+      "type": "PostgresConnectionOptionsStrategy",
+      "config": {
+        "url": "jdbc:postgresql://localhost:5432/example",
+        "username": "example",
+        "password": "example",
+        "maxConnections": 20
+      }
     }
   ]
 }
 ```
 
-Here we see, that when our feature being loaded it sends a message to the chain `registerPostgresConnectionOptions`. This is the server's inner chain defined inside the `database-postgresql-connection-options` feature. You can set db url, username, password and maxConnections in the message. To register this options inside IOC we will use our custom key name `connectionOptionsRegistrationName` so we'll be able in the project to select the proper connection. It might be useful when you have multiple databases in a project.
+Here we can see a new `database` section. It'll be read by the `database-service-starter` and using some `PostgresConnectionOptionsStrategy` register a connectionOptions with a name specified in `key` field. In our case it's `PostgresConnectionOptions`. You can specify as many new connection options as you need.
 
 ## Create collections
 
@@ -57,16 +109,25 @@ To use it, create a new feature, for example `CreateCollections` and fill the `c
 {
   "featureName": "com.my-project:create-collections",
   "afterFeatures": [
-    "info.smart_tools.smartactors:database-postgresql-create-collection-if-not-exists",
-    "com.my-project:setup-postgres-connection-options"
+    "com.my-project:setup-postgres-connection-options",
+    "info.smart_tools.smartactors:database-postgresql-create-collection-if-not-exists"
   ],
   "onFeatureLoading": [
     {
       "chain": "createCollections",
       "messages": [
         {
-          "collectionName": "example_collection",
-          "connectionOptionsRegistrationName": "MyConnectionOptions"
+          "collectionName": "example_collection_1",
+          "connectionOptionsRegistrationName": "PostgresConnectionOptions"
+        }
+      ]
+    },
+    {
+      "chain": "createCollections",
+      "messages": [
+        {
+          "collectionName": "example_collection_2",
+          "connectionOptionsRegistrationName": "PostgresConnectionOptions"
         }
       ]
     }
@@ -80,6 +141,10 @@ You can specify as many messages in `messages` section as many collections you n
 
 Best practises: add this messages in every feature, that need this collection. Do not create a single feature that creates everything. Here we do this just for education purposes.
 
+### Aware
+
+Do not combine `onFeatureLoading` and `database` sections, because there is no garantee of execution order. Always create a feature with connection options and a separate feature for working with this connection options.
+
 ## How to use it?
 
 You have registered options and created collections. How to use them?
@@ -87,9 +152,9 @@ You have registered options and created collections. How to use them?
 To do database tasks you need to have an `IPool` object, to get it use this snippet:
 
 ```java
-final ConnectionOptions options = IOC.resolve(Keys.getOrAdd(message.getConnectionOptionsRegistrationName()));
+final ConnectionOptions options = IOC.resolve(Keys.getOrAdd("PostgresConnectionOptions"));
 final IPool pool = IOC.resolve(Keys.getOrAdd("PostgresConnectionPool"), options);
-String collectionName = message.getCollectionName();
+String collectionName = "example_collection_1";
 try (PoolGuard guard = new PoolGuard(pool)) {
     ITask task = IOC.resolve(
             Keys.getOrAdd(SOME_TASK_ID),
@@ -102,3 +167,7 @@ try (PoolGuard guard = new PoolGuard(pool)) {
     throw new CreateCollectionActorException(e);
 }
 ```
+
+## Example
+
+You can dive into code here: [Example](https://github.com/SmartTools/tutorials/tree/master/src/postgresql_setup)
