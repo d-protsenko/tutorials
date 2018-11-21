@@ -39,6 +39,10 @@ How to write Message Map (TDB)
 
 [How to use Features](FeatureExample)
 
+[How to use Features Reloading](ReloadingExample)
+
+[How to use Features Versioning](VersioningExample)
+
 ## Testing
 
 [How to unit test](how_to_unit_test)
