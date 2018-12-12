@@ -1,0 +1,19 @@
+@startuml
+
+rectangle "Сервер" as server {
+}
+
+rectangle "Ядро" as core {
+}
+
+rectangle "Системные модули" as system_modules  {
+}
+
+rectangle "Прикладные модули" as app_modules {
+}
+
+server -down- core
+core -down- system_modules
+system_modules -down- app_modules
+
+@enduml
