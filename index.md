@@ -4,7 +4,7 @@ layout: page
 
 # SmartActors tutorials
 
-* [Basic architecture](architecture1/)
+* [Basic architecture](architecture/)
 * [Quickstart guides](quickstart/)
 * [DAS tool](das/)
 

@@ -3,7 +3,7 @@
 rectangle "Сервер" as server {
 }
 
-rectangle "Ядро" as core {
+rectangle "Ядро платформы" as core {
 }
 
 rectangle "Системные модули" as system_modules  {

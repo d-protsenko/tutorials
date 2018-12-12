@@ -1,0 +1,145 @@
+@startuml
+
+rectangle "Ядро платформы" as core {
+
+component "base" as base
+component "class-management" as classmanagement
+component "configuration-manager" as cfgmgr
+component "configuration-manager-plugins" as cfgmgrplgn
+component "core-service-starter" as coresrvstarter
+component "dumpable-interface" as dmpinterface
+component "feature-loading-system" as featureloadingsystem
+component "feature-management" as featuremngmnt
+component "field" as field
+component "field-plugins"  as fldplgn
+component "iobject" as iobject
+component "iobject-plugins" as iobjplgn
+component "iobject-extension" as iobjectextension
+component "iobject-extension-plugins" as iobjextplgn
+component "ioc" as ioc
+component "ioc-plugins" as iocplgn
+component "ioc-strategy-pack" as iocstrtgpck
+component "ioc-strategy-pack-plugins" as iocstrtgpckplgn
+component "message-processing-interfaces" as messageprocessinginterfaces
+component "message-processing" as msgprocessing
+component "message-processing-plugins" as messageprocessingplugins
+component "on-feature-loading-service-starter" as onfeatureloadsrvstarter
+component "scope" as scope
+component "scope-plugins" as scopeplgn
+component "shutdown" as shutdown
+component "shutdown-plugins" as shutdownplgn
+component "task" as task
+component "task-plugins.non-blocking-queue" as taskplgn
+component "version-management" as vermgmnt
+component "version-management-plugins" as vermgmtplgn
+
+base <-down- classmanagement
+
+iobject <-left- ioc
+scope <-down- ioc
+
+base <-down- iobject
+
+base <-down- scope
+
+classmanagement <-down- featureloadingsystem
+
+ioc <-down- iocplgn
+featureloadingsystem <-down- iocplgn
+
+ioc <-down- iocstrtgpck
+
+iocstrtgpck <-down- iocstrtgpckplgn
+featureloadingsystem <-down- iocstrtgpckplgn
+
+ioc <-down- messageprocessinginterfaces
+iobject <-down- messageprocessinginterfaces
+
+iobject <-down- cfgmgr
+
+cfgmgr <-down- cfgmgrplgn
+ioc <-down- cfgmgrplgn
+featureloadingsystem <-down- cfgmgrplgn
+
+cfgmgr <-down- coresrvstarter
+task <-down- coresrvstarter
+messageprocessinginterfaces <-down- coresrvstarter
+featureloadingsystem <-down- coresrvstarter
+iobjectextension <-down- coresrvstarter
+
+iobject <-down- dmpinterface
+
+messageprocessinginterfaces <-down- featuremngmnt
+ioc <-down- featuremngmnt
+task <-down- featuremngmnt
+featureloadingsystem <-down- featuremngmnt
+
+iobject <-down- field
+
+field <-down- fldplgn
+featureloadingsystem <-down- fldplgn
+ioc <-down- fldplgn
+
+ioc <-down- iobjplgn
+iobject <-down- iobjplgn
+featureloadingsystem <-down- iobjplgn
+
+ioc <-down- iobjectextension
+iobject <-down- iobjectextension
+
+iobjectextension <-down- iobjextplgn
+ioc <-down- iobjextplgn
+featureloadingsystem <-down- iobjextplgn
+
+messageprocessinginterfaces <-down- msgprocessing
+task <-down- msgprocessing
+iobjectextension <-down- msgprocessing
+
+iobject <-down- messageprocessingplugins
+ioc <-down- messageprocessingplugins
+featureloadingsystem <-down- messageprocessingplugins
+msgprocessing <-down- messageprocessingplugins
+
+messageprocessinginterfaces <-down- onfeatureloadsrvstarter
+cfgmgr <-down- onfeatureloadsrvstarter
+task <-down- onfeatureloadsrvstarter
+featureloadingsystem <-down- onfeatureloadsrvstarter
+iobject <-down- onfeatureloadsrvstarter
+iobjectextension <-down- onfeatureloadsrvstarter
+
+featureloadingsystem <-down- scopeplgn
+scope <-down- scopeplgn
+ioc <-down- scopeplgn
+
+task <-down- shutdown
+scopeplgn <-down- shutdown
+iocplgn <-down- shutdown
+iobjplgn <-down- shutdown
+
+featureloadingsystem <-down- shutdownplgn
+messageprocessinginterfaces <-down- shutdownplgn
+cfgmgr <-down- shutdownplgn
+shutdown <-down- shutdownplgn
+
+scope <-down- task
+classmanagement <-down- task
+msgprocessing <-down- task
+
+task <-down- taskplgn
+featureloadingsystem <-down- taskplgn
+ioc <-down- taskplgn
+
+ioc <-down- vermgmnt
+task <-down- vermgmnt
+classmanagement <-down- vermgmnt
+scope <-down- vermgmnt
+msgprocessing <-down- vermgmnt
+
+featureloadingsystem <-down- vermgmtplgn
+vermgmnt <-down- vermgmtplgn
+
+}
+
+
+
+@enduml
