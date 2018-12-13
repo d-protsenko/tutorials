@@ -95,9 +95,9 @@ corefeatures может содержать только один файл featur
 
 Более подробную документацию по типовым действиям с платформой 
 и das можно найти в разделе 
-[Quickstart guides](quickstart/).
+[Quickstart guides](../quickstart/).
 
-## Внутренняя архитектура платформы
+## Структура проектов платформы
 
 Платформа Smartactors представляет собой несколько 
 maven-проектов: 
@@ -120,36 +120,36 @@ maven-проектов:
 
 | | Модуль | Описание | Зависимости | 
 | ---: | :--- | --- | --- | 
-| 1 | base | Модуль реализует базовые интерфейсы платформы | -- | -- |
-| 2 | class-management | Модуль реализует систему управления модулями, загрузчик классов платформы и систему компиляции классов на лету | Base | -- |
-| 3 | feature-loading-system |  | | | | 
-| 4 | scope | | | | |   
-| 5 | scope-plugins | | | | |   
-| 6 | iobject | | | | |   
-| 7 | iobject-plugins | | | | |   
-| 8 | iobject-extension | | | | |   
-| 9 | iobject-extension-plugins | | | | |   
-| 10 | ioc ||||| 
-| 11 | ioc-plugins ||||| 
-| 12 | ioc-strategy-pack ||||| 
-| 13 | ioc-strategy-pack-plugins ||||| 
-| 14 | message-processing-interfaces ||||| 
-| 15 | message-processing ||||| 
-| 16 | message-processing-plugins ||||| 
-| 17 | dumpable-interface ||||| 
-| 18 | configuration-manager ||||| 
-| 19 | configuration-manager-plugins ||||| 
-| 20 | feature-management ||||| 
-| 21 | task ||||| 
-| 22 | task-plugins.non-blocking-queue ||||| 
-| 23 | core-service-starter||||| 
-| 24 | field ||||| 
-| 25 | field-plugins ||||| 
-| 26 | on-feature-loading-service-starter ||||| 
-| 27 | shutdown ||||| 
-| 28 | shutdown-plugins ||||| 
-| 29 | version-management ||||| 
-| 30 | version-management-plugins ||||| 
+| 1 | base | Модуль реализует базовые интерфейсы платформы | -- | 
+| 2 | class-management | Модуль реализует систему управления модулями, загрузчик классов платформы и систему компиляции классов на лету | Base | 
+| 3 | feature-loading-system |  | | 
+| 4 | scope | | | 
+| 5 | scope-plugins | | |    
+| 6 | iobject | | | 
+| 7 | iobject-plugins | | |    
+| 8 | iobject-extension | | |    
+| 9 | iobject-extension-plugins | | |    
+| 10 | ioc |||
+| 11 | ioc-plugins ||| 
+| 12 | ioc-strategy-pack ||| 
+| 13 | ioc-strategy-pack-plugins ||| 
+| 14 | message-processing-interfaces ||| 
+| 15 | message-processing |||
+| 16 | message-processing-plugins ||| 
+| 17 | dumpable-interface |||
+| 18 | configuration-manager ||| 
+| 19 | configuration-manager-plugins ||| 
+| 20 | feature-management |||
+| 21 | task |||
+| 22 | task-plugins.non-blocking-queue ||| 
+| 23 | core-service-starter |||
+| 24 | field |||
+| 25 | field-plugins ||| 
+| 26 | on-feature-loading-service-starter ||| 
+| 27 | shutdown |||
+| 28 | shutdown-plugins ||| 
+| 29 | version-management ||| 
+| 30 | version-management-plugins ||| 
 
 ## Архитектура системного слоя
 
