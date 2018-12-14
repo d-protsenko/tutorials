@@ -120,21 +120,21 @@ maven-проектов:
 
 | | Модуль | Описание | Зависимости | 
 | ---: | :--- | --- | --- | 
-| 1 | base | Модуль реализует базовые интерфейсы платформы | -- | 
-| 2 | class-management | Модуль реализует систему управления модулями, загрузчик классов платформы и систему компиляции классов на лету | Base | 
-| 3 | feature-loading-system |  | | 
-| 4 | scope | | | 
-| 5 | scope-plugins | | |    
-| 6 | iobject | | | 
-| 7 | iobject-plugins | | |    
-| 8 | iobject-extension | | |    
-| 9 | iobject-extension-plugins | | |    
-| 10 | ioc |||
-| 11 | ioc-plugins ||| 
-| 12 | ioc-strategy-pack ||| 
-| 13 | ioc-strategy-pack-plugins ||| 
-| 14 | message-processing-interfaces ||| 
-| 15 | message-processing |||
+| 1 | base | Модуль содержит базовые интерфейсы платформы | -- | 
+| 2 | class-management | Модуль реализует систему управления модулями, загрузчик классов платформы и систему компиляции классов на лету. | base | 
+| 3 | feature-loading-system | Модуль обеспечивает загрузку классов модулей платформы и упорядоченный запуск плагинов модулей в соответствии с их зависимостями. | base | 
+| 4 | scope | Модуль реализует поддержку скоупов на платформе. | base | 
+| 5 | scope-plugins | Модуль содержит плагины, инициализирующие функциональность скоупов. | base, feature-loading-system, scope, ioc |    
+| 6 | iobject | Модуль содержит интерфейсы и их реализацию для работы с json-объектами. | base | 
+| 7 | iobject-plugins | Модуль содержит плагины, регистрирующие в ioc стратегии работы с json-объектами. | base, iobject, feature-loading-system, ioc |    
+| 8 | iobject-extension | Модуль содержит дополнительные реализации интерфейсов для работы с json-объектами.  | base, iobject, ioc |    
+| 9 | iobject-extension-plugins | Модуль содержит плагины, регистрирующие в ioc дополнительные стратегии работы с json-объектами. | base, iobject-extention, feature-loading-system, ioc |    
+| 10 | ioc | Модуль реализует функциональность системного сервис-локатора. | base, iobject, scope |
+| 11 | ioc-plugins | Модуль содержит плагины, инициализирующие системный сервис-локатор. | ioc, feature-loading-system | 
+| 12 | ioc-strategy-pack | Модуль содержит дополнительные стратегии для работы системного сервис-локатора. |  base, iobject, ioc | 
+| 13 | ioc-strategy-pack-plugins | Модуль содержит плагины, регистрирующие дополнительные стратегии для работы с системным сервис-локатором. | base, feature-loading-system, ioc, ioc-plugins  | 
+| 14 | message-processing-interfaces |  |  | 
+| 15 | message-processing | | |
 | 16 | message-processing-plugins ||| 
 | 17 | dumpable-interface |||
 | 18 | configuration-manager ||| 
