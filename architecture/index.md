@@ -117,12 +117,15 @@ maven-проектов:
 
 ![Core Architecture](pic2.png "Архитектура ядра платформы")
 
-Таблица со списком модулей ядра и их кратким описанием
+Таблица со списком модулей ядра и их кратким описанием (в 
+список зависимостей не включены модули, от которых зависят 
+авто-тесты модуля, а также зависимости от пакетов вне ядра 
+платформы).
 
 | | Модуль | Описание | Зависимости | 
 | ---: | :--- | --- | --- | 
 | 1 | base | Модуль содержит базовые интерфейсы платформы | -- | 
-| 2 | class-management | Модуль реализует систему управления модулями, загрузчик классов платформы и систему компиляции классов на лету. | base | 
+| 2 | class-management | Модуль реализует систему учета модулей, загрузчик классов платформы и систему компиляции классов на лету. | base | 
 | 3 | feature-loading-system | Модуль обеспечивает загрузку классов модулей платформы и упорядоченный запуск плагинов модулей в соответствии с их зависимостями. | base | 
 | 4 | scope | Модуль реализует поддержку скоупов на платформе. | base | 
 | 5 | scope-plugins | Модуль содержит плагины, инициализирующие функциональность скоупов. | base, feature-loading-system, scope, ioc |    
@@ -130,27 +133,27 @@ maven-проектов:
 | 7 | iobject-plugins | Модуль содержит плагины, регистрирующие в ioc стратегии работы с json-объектами. | base, iobject, feature-loading-system, ioc |    
 | 8 | iobject-extension | Модуль содержит дополнительные реализации интерфейсов для работы с json-объектами.  | base, iobject, ioc |    
 | 9 | iobject-extension-plugins | Модуль содержит плагины, регистрирующие в ioc дополнительные стратегии работы с json-объектами. | base, iobject-extention, feature-loading-system, ioc |    
+| 14 | dumpable-interface | Модуль содержит интерфейс создания сериализованной копии объекта. | base, iobject |
 | 10 | ioc | Модуль реализует функциональность системного сервис-локатора. | base, iobject, scope |
 | 11 | ioc-plugins | Модуль содержит плагины, инициализирующие системный сервис-локатор. | ioc, feature-loading-system | 
 | 12 | ioc-strategy-pack | Модуль содержит дополнительные стратегии для работы системного сервис-локатора. |  base, iobject, ioc | 
 | 13 | ioc-strategy-pack-plugins | Модуль содержит плагины, регистрирующие дополнительные стратегии для работы с системным сервис-локатором. | base, feature-loading-system, ioc, ioc-plugins  | 
-| 14 | message-processing-interfaces |  |  | 
-| 15 | message-processing | | |
-| 16 | message-processing-plugins ||| 
-| 17 | dumpable-interface |||
-| 18 | configuration-manager ||| 
-| 19 | configuration-manager-plugins ||| 
-| 20 | feature-management |||
-| 21 | task |||
-| 22 | task-plugins.non-blocking-queue ||| 
-| 23 | core-service-starter |||
-| 24 | field |||
-| 25 | field-plugins ||| 
-| 26 | on-feature-loading-service-starter ||| 
-| 27 | shutdown |||
-| 28 | shutdown-plugins ||| 
-| 29 | version-management ||| 
-| 30 | version-management-plugins ||| 
+| 24 | configuration-manager | Модуль содуржит интерфейс и реализацию функциональности управления стратегиями загрузки конфигураций из конфигурационных файлов. | base, iobject | 
+| 25 | configuration-manager-plugins | Модуль содержит плагины, регистрирующие стратегии управления загрузкой конфигураций из конфигурационных файлов. | base, feature-loading-system, iobject, ioc, configuration-manager | 
+| 17 | shutdown | Модуль содержит интерфейсы и стратегии обработки задач завершения. | base, iobject, ioc, task |
+| 18 | shutdown-plugins | Модуль содержит плагины, регистрирующие стратегии обработки задач завершения, а также обработки секции завершения файла конфигурации. | base, class-management, feature-loading-system, iobject, ioc, configuration-manager, message-processing-interfaces, task, shutdown | 
+| 19 | field | Модуль содержит реализации интерфейса к полю данных. | iobject, ioc |
+| 20 | field-plugins | Модуль содержит плагины, регистрирующие стратегии работы с полями данных. | feature-loading-system, iobject, ioc | 
+| 21 | message-processing-interfaces | Модуль содержит интерфейсы для контейнеров, стратегий и других базовых компонент обработки сообщений.  |  base, iobject, ioc | 
+| 15 | task | Модуль содержит интерфейсы и их реализацию для управления потоком выполняемых задач. | base, dumpable-interface, iobject, scope, class-management, message-processing-interfaces |
+| 16 | task-plugins.non-blocking-queue | Модуль содержит плагин, инициализирующий неблокирующую очередь задач платформы. | base, task, feature-loading-system, ioc | 
+| 22 | message-processing | Модуль реализует базовую функциональнось платформы для обработки сообщений. | base, message-processing-interfaces, ioc, iobject, class-management, dumpable-interface, task, shutdown, iobject-extension, field |
+| 23 | message-processing-plugins | Модуль содержит плагины, регистрирующие стратегии работы с базовыми элементами платформы, такими как сообщения, акторы, цепочки, обработчики, маршрутизаторы, последовательности, обертки и т.д. |  base, feature-loading-system, iobject, ioc, message-processing, task, message-processing-interfaces | 
+| 26 | feature-management | Модуль реализует функциональность по загрузке и управлению модулями платформы. | base, class-management, feature-loading-system, iobject, ioc, message-processing-interfaces, task |
+| 27 | core-service-starter | Модуль реализует фунциональность загрузки секций объектов, цепочек и исполнителей файла конфигурациии, а также плагин, регистрирующий эту функциональность. | base, feature-loading-system, iobject, iobject-extension, ioc, configuration-manager, task, message-processing-interfaces |
+| 28 | on-feature-loading-service-starter | Модуль реализует фунциональность обработки загрузочной секции файла конфигурациии, а также плагин, регистрирующий эту функциональность. | base, class-management, feature-loading-system, message-processing-interfaces, iobject, ioc, configuration-manager, task | 
+| 29 | version-management | Модуль реализует функциональность по управлению версионированием модулей на платформе. | base, class-management, scope, iobject, ioc, message-processing-interfaces, message-processing, task | 
+| 30 | version-management-plugins | Модуль содержит плагин, регистрирующий стратегии по управлению версионированием модулей платформы. |  base, class-management, feature-loading-system, ioc, task, message-processing, version-management | 
 
 ## Архитектура системного слоя
 
