@@ -164,9 +164,48 @@ maven-проектов:
 
 | | Модуль | Описание | Зависимости | 
 | ---: | :--- | --- | --- | 
-| 1 | endpoint | | |
-| 2 | | | |
-| 3 | | | |
+|  | checkpoint |  |  |
+|  | checkpoint-plugins |  |  |
+|  | checkpoint-auto-startup |  |  |
+|  | database |  |  |
+|  | database-plugins |  |  |
+|  | database-in-memory |  |  |
+|  | database-in-memory-plugins |  |  |
+|  | database-postgresql |  |  |
+|  | database-postgresql-plugins |  |  |
+|  | database-null-connection-pool-plugins |  |  |
+|  | database-postgresql-async-ops-collection |  |  |
+|  | database-postgresql-cached-collection |  |  |
+|  | database-service-starter |  |  |
+|  | debugger |  |  |
+|  | debugger-plugins |  |  |
+|  | dumpable-plugins |  |  |
+|  | endpoint |  |  |
+|  | endpoint-plugins |  |  |
+|  | endpoint-service-starter |  |  |
+|  | global-constants-service-starter |  |  |
+|  | helpers |  |  |
+|  | http-endpoint |  |  |
+|  | http-endpoint-plugins |  |  |
+|  | https-endpoint |  |  |
+|  | https-endpoint-plugins |  |  |
+|  | in-memory-database-service-starter |  |  |
+|  | message-bus |  |  |
+|  | message-bus-plugins |  |  |
+|  | message-bus-service-starter |  |  |
+|  | morph-expressions |  |  |
+|  | remote-management |  |  |
+|  | scheduler |  |  |
+|  | scheduler-plugins |  |  |
+|  | scheduler-auto-startup |  |  |
+|  | security |  |  |
+|  | security-plugins |  |  |
+|  | statistics |  |  |
+|  | statistics-plugins |  |  |
+|  | testing |  |  |
+|  | testing-plugins |  |  |
+|  | timer |  |  |
+|  | timer-plugins |  |  |
 
 ## Подробное описание модулей ядра и системных модулей
 
