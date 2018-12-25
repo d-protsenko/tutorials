@@ -164,9 +164,9 @@ maven-проектов:
 
 | | Модуль | Описание | Зависимости | 
 | ---: | :--- | --- | --- | 
-|  | checkpoint |  |  |
-|  | checkpoint-plugins |  |  |
-|  | checkpoint-auto-startup |  |  |
+|  | checkpoint | Модуль реализует функциональность контрольных точек при обработке сообщений. | *base, iobject, ioc, message-processing-interfaces, configuration-manager, task,* **dumpable-plugins, scheduler, scheduler-plugins, message_bus** |
+|  | checkpoint-plugins | Модуль содержит плагин, регистрирующий акторы и стратегии по управлению контрольными точками. | *base, feature-loading-system, iobject, ioc,* **checkpoint** |
+|  | checkpoint-auto-startup | Модуль содержит плагин, инициализирующий планировщик (scheduler) для актора контрольных точек. | *base, feature-loading-system, iobject, ioc, task,* **scheduler, checkpoint-plugins**|
 |  | database |  |  |
 |  | database-plugins |  |  |
 |  | database-in-memory |  |  |
