@@ -167,13 +167,13 @@ maven-проектов:
 |  | dumpable-plugins | Модуль содержит плагин, регистрирующий стратегию создания сериализованной копии объекта через интерфейс dumpable. | *base, feature-loading-system, dumpable-interface, ioc* |
 |  | timer | Модуль содержит интерфейс и реализует функциональность таймера. | *base, class-management, ioc, task* |
 |  | timer-plugins | Модуль содержит плагин, регистрирующий стратегии работы с таймером. | *base, feature-loading-system, ioc,* **timer** |
-|  | message-bus |  |  |
-|  | message-bus-plugins |  |  |
-|  | message-bus-service-starter |  |  |
+|  | message-bus | Модуль содержит интерфейсы и реализацию функционала шины сообщений платформы. | *base, class-management, scope, message-processing-interfaces, iobject, ioc, task* |
+|  | message-bus-plugins | Модуль содержит плагин, регистрирующий стратегию обработки ответа на сообщение, отправленное  по шине. | *base, feature-loading-system, iobject, ioc,* **message-bus** |
+|  | message-bus-service-starter | Модуль реализует фунциональность обработки секции шины сообщений файла конфигурациии, а также плагин, регистрирующий соответствующую стратегию в менеджере конфигураций (cinfiguration-manager). | *class-management, message-processing-interfaces, feature-loading-system, configuration-manager, ioc, task,* **message-bus, message-bus-plugins** |
 |  | scheduler | Модуль содержит актор, интерфейсы и стратегии, реализующие функциональность планировщика. | *base, class-management, message-processing-interfaces, iobject, ioc, task,* **timer, timer-plugins, message_bus, message-bus-plugins** |
 |  | scheduler-plugins | Модуль содержит плагины, регистрирующие стратегии работы с планировщиком. | *base, feature-loading-system, ioc,* **scheduler** |
 |  | scheduler-auto-startup | Модуль содержит плагин, регистрирующий стратегию инициализации актора планировщика. | *base, feature-loading-system, iobject, ioc, task,* **scheduler, scheduler-plugins** |
-|  | checkpoint | Модуль реализует функциональность контрольных точек при обработке сообщений. | *base, iobject, ioc, message-processing-interfaces, configuration-manager, task,* **dumpable-plugins, scheduler, scheduler-plugins, message_bus** |
+|  | checkpoint | Модуль реализует функциональность контрольных точек при обработке сообщений. | *base, iobject, ioc, message-processing-interfaces, configuration-manager, task,* **dumpable-plugins, scheduler, scheduler-plugins, message-bus** |
 |  | checkpoint-plugins | Модуль содержит плагин, регистрирующий акторы и стратегии по управлению контрольными точками. | *base, feature-loading-system, iobject, ioc,* **checkpoint** |
 |  | checkpoint-auto-startup | Модуль содержит плагин, регистрирующий стратегию инициализации актора планировщика (scheduler) для актора контрольных точек. | *base, feature-loading-system, iobject, ioc, task,* **scheduler, checkpoint-plugins**|
 |  | database |  |  |
