@@ -164,9 +164,18 @@ maven-проектов:
 
 | | Модуль | Описание | Зависимости | 
 | ---: | :--- | --- | --- | 
+|  | dumpable-plugins | Модуль содержит плагин, регистрирующий стратегию создания сериализованной копии объекта через интерфейс dumpable. | *base, feature-loading-system, dumpable-interface, ioc* |
+|  | timer | Модуль содержит интерфейс и реализует функциональность таймера. | *base, class-management, ioc, task* |
+|  | timer-plugins | Модуль содержит плагин, регистрирующий стратегии работы с таймером. | *base, feature-loading-system, ioc,* **timer** |
+|  | message-bus |  |  |
+|  | message-bus-plugins |  |  |
+|  | message-bus-service-starter |  |  |
+|  | scheduler | Модуль содержит актор, интерфейсы и стратегии, реализующие функциональность планировщика. | *base, class-management, message-processing-interfaces, iobject, ioc, task,* **timer, timer-plugins, message_bus, message-bus-plugins** |
+|  | scheduler-plugins | Модуль содержит плагины, регистрирующие стратегии работы с планировщиком. | *base, feature-loading-system, ioc,* **scheduler** |
+|  | scheduler-auto-startup | Модуль содержит плагин, регистрирующий стратегию инициализации актора планировщика. | *base, feature-loading-system, iobject, ioc, task,* **scheduler, scheduler-plugins** |
 |  | checkpoint | Модуль реализует функциональность контрольных точек при обработке сообщений. | *base, iobject, ioc, message-processing-interfaces, configuration-manager, task,* **dumpable-plugins, scheduler, scheduler-plugins, message_bus** |
 |  | checkpoint-plugins | Модуль содержит плагин, регистрирующий акторы и стратегии по управлению контрольными точками. | *base, feature-loading-system, iobject, ioc,* **checkpoint** |
-|  | checkpoint-auto-startup | Модуль содержит плагин, инициализирующий планировщик (scheduler) для актора контрольных точек. | *base, feature-loading-system, iobject, ioc, task,* **scheduler, checkpoint-plugins**|
+|  | checkpoint-auto-startup | Модуль содержит плагин, регистрирующий стратегию инициализации актора планировщика (scheduler) для актора контрольных точек. | *base, feature-loading-system, iobject, ioc, task,* **scheduler, checkpoint-plugins**|
 |  | database |  |  |
 |  | database-plugins |  |  |
 |  | database-in-memory |  |  |
@@ -179,7 +188,6 @@ maven-проектов:
 |  | database-service-starter |  |  |
 |  | debugger |  |  |
 |  | debugger-plugins |  |  |
-|  | dumpable-plugins |  |  |
 |  | endpoint |  |  |
 |  | endpoint-plugins |  |  |
 |  | endpoint-service-starter |  |  |
@@ -190,22 +198,14 @@ maven-проектов:
 |  | https-endpoint |  |  |
 |  | https-endpoint-plugins |  |  |
 |  | in-memory-database-service-starter |  |  |
-|  | message-bus |  |  |
-|  | message-bus-plugins |  |  |
-|  | message-bus-service-starter |  |  |
 |  | morph-expressions |  |  |
 |  | remote-management |  |  |
-|  | scheduler |  |  |
-|  | scheduler-plugins |  |  |
-|  | scheduler-auto-startup |  |  |
 |  | security |  |  |
 |  | security-plugins |  |  |
 |  | statistics |  |  |
 |  | statistics-plugins |  |  |
 |  | testing |  |  |
 |  | testing-plugins |  |  |
-|  | timer |  |  |
-|  | timer-plugins |  |  |
 
 ## Подробное описание модулей ядра и системных модулей
 
