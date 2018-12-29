@@ -150,8 +150,8 @@ maven-проектов:
 | 22 | message-processing | Модуль реализует базовую функциональнось платформы для обработки сообщений. | base, message-processing-interfaces, ioc, iobject, class-management, dumpable-interface, task, shutdown, iobject-extension, field |
 | 23 | message-processing-plugins | Модуль содержит плагины, регистрирующие стратегии работы с базовыми элементами платформы, такими как сообщения, акторы, цепочки, обработчики, маршрутизаторы, последовательности, обертки и т.д. |  base, feature-loading-system, iobject, ioc, message-processing, task, message-processing-interfaces | 
 | 26 | feature-management | Модуль реализует функциональность по загрузке и управлению модулями платформы. | base, class-management, feature-loading-system, iobject, ioc, message-processing-interfaces, task |
-| 27 | core-service-starter | Модуль реализует фунциональность загрузки секций объектов, цепочек и исполнителей файла конфигурациии, а также плагин, регистрирующий эту функциональность. | base, feature-loading-system, iobject, iobject-extension, ioc, configuration-manager, task, message-processing-interfaces |
-| 28 | on-feature-loading-service-starter | Модуль реализует фунциональность обработки загрузочной секции файла конфигурациии, а также плагин, регистрирующий эту функциональность. | base, class-management, feature-loading-system, message-processing-interfaces, iobject, ioc, configuration-manager, task | 
+| 27 | core-service-starter | Модуль реализует фунциональность загрузки секций объектов, цепочек и исполнителей файла конфигурациии, а также плагин, регистрирующий соответствующую стратегию в менеджере конфигураций (cinfiguration-manager). | base, feature-loading-system, iobject, iobject-extension, ioc, configuration-manager, task, message-processing-interfaces |
+| 28 | on-feature-loading-service-starter | Модуль реализует фунциональность обработки загрузочной секции файла конфигурациии, а также плагин, регистрирующий соответствующую стратегию в менеджере конфигураций (cinfiguration-manager). | base, class-management, feature-loading-system, message-processing-interfaces, iobject, ioc, configuration-manager, task | 
 | 29 | version-management | Модуль реализует функциональность по управлению версионированием модулей на платформе. | base, class-management, scope, iobject, ioc, message-processing-interfaces, message-processing, task | 
 | 30 | version-management-plugins | Модуль содержит плагин, регистрирующий стратегии по управлению версионированием модулей платформы. |  base, class-management, feature-loading-system, ioc, task, message-processing, version-management | 
 
@@ -168,7 +168,7 @@ maven-проектов:
 |  | timer | Модуль содержит интерфейс и реализует функциональность таймера. | *base, class-management, ioc, task* |
 |  | timer-plugins | Модуль содержит плагин, регистрирующий стратегии работы с таймером. | *base, feature-loading-system, ioc,* **timer** |
 |  | message-bus | Модуль содержит интерфейсы и реализацию функционала шины сообщений платформы. | *base, class-management, scope, message-processing-interfaces, iobject, ioc, task* |
-|  | message-bus-plugins | Модуль содержит плагин, регистрирующий стратегию обработки ответа на сообщение, отправленное  по шине. | *base, feature-loading-system, iobject, ioc,* **message-bus** |
+|  | message-bus-plugins | Модуль содержит плагин, регистрирующий стратегию обработки ответа на сообщение, отправленное по шине. | *base, feature-loading-system, iobject, ioc,* **message-bus** |
 |  | message-bus-service-starter | Модуль реализует фунциональность обработки секции шины сообщений файла конфигурациии, а также плагин, регистрирующий соответствующую стратегию в менеджере конфигураций (cinfiguration-manager). | *class-management, message-processing-interfaces, feature-loading-system, configuration-manager, ioc, task,* **message-bus, message-bus-plugins** |
 |  | scheduler | Модуль содержит актор, интерфейсы и стратегии, реализующие функциональность планировщика. | *base, class-management, message-processing-interfaces, iobject, ioc, task,* **timer, timer-plugins, message_bus, message-bus-plugins** |
 |  | scheduler-plugins | Модуль содержит плагины, регистрирующие стратегии работы с планировщиком. | *base, feature-loading-system, ioc,* **scheduler** |
@@ -176,6 +176,13 @@ maven-проектов:
 |  | checkpoint | Модуль реализует функциональность контрольных точек при обработке сообщений. | *base, iobject, ioc, message-processing-interfaces, configuration-manager, task,* **dumpable-plugins, scheduler, scheduler-plugins, message-bus** |
 |  | checkpoint-plugins | Модуль содержит плагин, регистрирующий акторы и стратегии по управлению контрольными точками. | *base, feature-loading-system, iobject, ioc,* **checkpoint** |
 |  | checkpoint-auto-startup | Модуль содержит плагин, регистрирующий стратегию инициализации актора планировщика (scheduler) для актора контрольных точек. | *base, feature-loading-system, iobject, ioc, task,* **scheduler, checkpoint-plugins**|
+|  | endpoint | Модуль реализует функциональность абстрактной точки ввода-вывода сообщений. | *base, class-management, scope, message-processing-interfaces, message-processing, iobject, ioc, task,* **message-bus** |
+|  | endpoint-plugins | Модуль содержит плагин, регистрирующий актор и стратегии обработки ответа на сообщения, полученные через точку ввода-вывода (endpoint). | *base, feature-loading-system, iobject, ioc,* **endpoint** |
+|  | endpoint-service-starter | Модуль реализует фунциональность обработки секции точки ввода-вывода (endpoint) в файле конфигурациии, а также плагин, регистрирующий соответствующую стратегию в менеджере конфигураций (cinfiguration-manager). | *base, class-management, feature-loading-system, message-processing-interfaces, iobject, ioc, configuration-manager, task,* **endpoint** |
+|  | http-endpoint | Модуль реализует функциональность ввода-вывода сообщений по протоколу http. | *base, class-management, scope, feature-loading-system, iobject, ioc, task, message-processing-interfaces, message-processing,* **timer, timer-plugins, endpoint, endpoint-plugins, message-bus** |
+|  | http-endpoint-plugins | Модуль содержит плагины, регистрирующие объекты и стратегии для обработки сообщений, полученных через http-точку ввода-вывода (http-endpoint). | *base, feature-loading-system, ioc, message-processing-interfaces,* **timer, endpoint, http-endpoint** |
+|  | https-endpoint | Модуль реализует функциональность ввода-вывода сообщений по протоколу https. | *iobject, ioc,* **endpoint, http-endpoint** |
+|  | https-endpoint-plugins | Модуль содержит плагины, регистрирующие объекты и стратегии для обработки сообщений, полученных через https-точку ввода-вывода (https-endpoint). | *base, feature-loading-system, message-processing-interfaces, iobject, ioc,* **endpoint, https-endpoint, http-endpoint-plugins** |
 |  | database |  |  |
 |  | database-plugins |  |  |
 |  | database-in-memory |  |  |
@@ -188,15 +195,8 @@ maven-проектов:
 |  | database-service-starter |  |  |
 |  | debugger |  |  |
 |  | debugger-plugins |  |  |
-|  | endpoint |  |  |
-|  | endpoint-plugins |  |  |
-|  | endpoint-service-starter |  |  |
 |  | global-constants-service-starter |  |  |
 |  | helpers |  |  |
-|  | http-endpoint |  |  |
-|  | http-endpoint-plugins |  |  |
-|  | https-endpoint |  |  |
-|  | https-endpoint-plugins |  |  |
 |  | in-memory-database-service-starter |  |  |
 |  | morph-expressions |  |  |
 |  | remote-management |  |  |
