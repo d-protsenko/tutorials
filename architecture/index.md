@@ -1,4 +1,4 @@
-# Концептуальная архитектура платформы Smartactors
+﻿# Концептуальная архитектура платформы Smartactors
 
 Версия 0.0.1
 
@@ -117,9 +117,9 @@ maven-проектов:
 
 ## Архитектура ядра
 
-Архитектура ядра платформы представлена следующей диаграммой
+Схема зависимостей модулей ядра платформы представлена следующей диаграммой
 
-![Core Architecture](pic2.png "Архитектура ядра платформы")
+![Core Architecture](core_schema_ru.png "Схема зависимостей модулей ядра платформы")
 
 Таблица со списком модулей ядра и их кратким описанием (в 
 список зависимостей не включены модули, от которых зависят 
@@ -137,22 +137,22 @@ maven-проектов:
 | 7 | iobject-plugins | Модуль содержит плагины, регистрирующие в ioc стратегии работы с json-объектами. | base, iobject, feature-loading-system, ioc |    
 | 8 | iobject-extension | Модуль содержит дополнительные реализации интерфейсов для работы с json-объектами.  | base, iobject, ioc |    
 | 9 | iobject-extension-plugins | Модуль содержит плагины, регистрирующие в ioc дополнительные стратегии работы с json-объектами. | base, iobject-extention, feature-loading-system, ioc |    
-| 14 | dumpable-interface | Модуль содержит интерфейс создания сериализованной копии объекта. | base, iobject |
-| 10 | ioc | Модуль реализует функциональность системного сервис-локатора. | base, iobject, scope |
-| 11 | ioc-plugins | Модуль содержит плагины, инициализирующие системный сервис-локатор. | ioc, feature-loading-system | 
-| 12 | ioc-strategy-pack | Модуль содержит дополнительные стратегии для работы системного сервис-локатора. |  base, iobject, ioc | 
-| 13 | ioc-strategy-pack-plugins | Модуль содержит плагины, регистрирующие дополнительные стратегии для работы с системным сервис-локатором. | base, feature-loading-system, ioc, ioc-plugins  | 
-| 24 | configuration-manager | Модуль содуржит интерфейс и реализацию функциональности управления стратегиями загрузки конфигураций из конфигурационных файлов. | base, iobject | 
-| 25 | configuration-manager-plugins | Модуль содержит плагины, регистрирующие стратегии управления загрузкой конфигураций из конфигурационных файлов. | base, feature-loading-system, iobject, ioc, configuration-manager | 
-| 17 | shutdown | Модуль содержит интерфейсы и стратегии обработки задач завершения. | base, iobject, ioc, task |
-| 18 | shutdown-plugins | Модуль содержит плагины, регистрирующие стратегии обработки задач завершения, а также обработки секции завершения файла конфигурации. | base, class-management, feature-loading-system, iobject, ioc, configuration-manager, message-processing-interfaces, task, shutdown | 
-| 19 | field | Модуль содержит реализации интерфейса к полю данных. | iobject, ioc |
-| 20 | field-plugins | Модуль содержит плагины, регистрирующие стратегии работы с полями данных. | feature-loading-system, iobject, ioc | 
-| 21 | message-processing-interfaces | Модуль содержит интерфейсы для контейнеров, стратегий и других базовых компонент обработки сообщений.  |  base, iobject, ioc | 
-| 15 | task | Модуль содержит интерфейсы и их реализацию для управления потоком выполняемых задач. | base, dumpable-interface, iobject, scope, class-management, message-processing-interfaces |
-| 16 | task-plugins.non-blocking-queue | Модуль содержит плагин, инициализирующий неблокирующую очередь задач платформы. | base, task, feature-loading-system, ioc | 
-| 22 | message-processing | Модуль реализует базовую функциональнось платформы для обработки сообщений. | base, message-processing-interfaces, ioc, iobject, class-management, dumpable-interface, task, shutdown, iobject-extension, field |
-| 23 | message-processing-plugins | Модуль содержит плагины, регистрирующие стратегии работы с базовыми элементами платформы, такими как сообщения, акторы, цепочки, обработчики, маршрутизаторы, последовательности, обертки и т.д. |  base, feature-loading-system, iobject, ioc, message-processing, task, message-processing-interfaces | 
+| 10 | dumpable-interface | Модуль содержит интерфейс создания сериализованной копии объекта. | base, iobject |
+| 11 | ioc | Модуль реализует функциональность системного сервис-локатора. | base, iobject, scope |
+| 12 | ioc-plugins | Модуль содержит плагины, инициализирующие системный сервис-локатор. | ioc, feature-loading-system | 
+| 13 | ioc-strategy-pack | Модуль содержит дополнительные стратегии для работы системного сервис-локатора. |  base, iobject, ioc | 
+| 14 | ioc-strategy-pack-plugins | Модуль содержит плагины, регистрирующие дополнительные стратегии для работы с системным сервис-локатором. | base, feature-loading-system, ioc, ioc-plugins  | 
+| 15 | configuration-manager | Модуль содуржит интерфейс и реализацию функциональности управления стратегиями загрузки конфигураций из конфигурационных файлов. | base, iobject | 
+| 16 | configuration-manager-plugins | Модуль содержит плагины, регистрирующие стратегии управления загрузкой конфигураций из конфигурационных файлов. | base, feature-loading-system, iobject, ioc, configuration-manager | 
+| 17 | field | Модуль содержит реализации интерфейса к полю данных. | iobject, ioc |
+| 18 | field-plugins | Модуль содержит плагины, регистрирующие стратегии работы с полями данных. | feature-loading-system, iobject, ioc, field | 
+| 19 | message-processing-interfaces | Модуль содержит интерфейсы для контейнеров, стратегий и других базовых компонент обработки сообщений.  |  base, iobject, ioc | 
+| 20 | task | Модуль содержит интерфейсы и их реализацию для управления потоком выполняемых задач. | base, dumpable-interface, iobject, scope, class-management, message-processing-interfaces |
+| 21 | task-plugins.non-blocking-queue | Модуль содержит плагин, инициализирующий неблокирующую очередь задач платформы. | base, task, feature-loading-system, ioc | 
+| 22 | shutdown | Модуль содержит интерфейсы и стратегии обработки задач завершения. | base, iobject, ioc, task |
+| 23 | shutdown-plugins | Модуль содержит плагины, регистрирующие стратегии обработки задач завершения, а также обработки секции завершения файла конфигурации. | base, class-management, feature-loading-system, iobject, ioc, configuration-manager, message-processing-interfaces, task, shutdown | 
+| 24 | message-processing | Модуль реализует базовую функциональнось платформы для обработки сообщений. | base, message-processing-interfaces, ioc, iobject, class-management, dumpable-interface, task, shutdown, iobject-extension, field |
+| 25 | message-processing-plugins | Модуль содержит плагины, регистрирующие стратегии работы с базовыми элементами платформы, такими как сообщения, акторы, цепочки, обработчики, маршрутизаторы, последовательности, обертки и т.д. |  base, feature-loading-system, iobject, ioc, message-processing, task, message-processing-interfaces | 
 | 26 | feature-management | Модуль реализует функциональность по загрузке и управлению модулями платформы. | base, class-management, feature-loading-system, iobject, ioc, message-processing-interfaces, task |
 | 27 | core-service-starter | Модуль реализует фунциональность загрузки секций объектов, цепочек и исполнителей файла конфигурациии, а также плагин, регистрирующий соответствующую стратегию в менеджере конфигураций (cinfiguration-manager). | base, feature-loading-system, iobject, iobject-extension, ioc, configuration-manager, task, message-processing-interfaces |
 | 28 | on-feature-loading-service-starter | Модуль реализует фунциональность обработки загрузочной секции файла конфигурациии, а также плагин, регистрирующий соответствующую стратегию в менеджере конфигураций (cinfiguration-manager). | base, class-management, feature-loading-system, message-processing-interfaces, iobject, ioc, configuration-manager, task | 
@@ -191,25 +191,25 @@ maven-проектов:
 |  | https-endpoint-plugins | Модуль содержит плагины, регистрирующие объекты и стратегии для обработки сообщений, полученных через https-точку ввода-вывода (https-endpoint). | *base, feature-loading-system, message-processing-interfaces, iobject, ioc,* **endpoint, https-endpoint, http-endpoint-plugins** |
 |  | database |  |  |
 |  | database-plugins |  |  |
+|  | database-service-starter |  |  |
 |  | database-in-memory |  |  |
 |  | database-in-memory-plugins |  |  |
+|  | in-memory-database-service-starter |  |  |
 |  | database-postgresql |  |  |
 |  | database-postgresql-plugins |  |  |
 |  | database-null-connection-pool-plugins |  |  |
 |  | database-postgresql-async-ops-collection |  |  |
 |  | database-postgresql-cached-collection |  |  |
-|  | database-service-starter |  |  |
 |  | debugger |  |  |
 |  | debugger-plugins |  |  |
 |  | global-constants-service-starter |  |  |
 |  | helpers |  |  |
-|  | in-memory-database-service-starter |  |  |
 |  | morph-expressions |  |  |
-|  | remote-management |  |  |
-|  | security |  |  |
-|  | security-plugins |  |  |
-|  | statistics |  |  |
-|  | statistics-plugins |  |  |
+|  | remote-management | Модуль реализует функциональность (в виде актора и цепочек) удаленной и локальной дозагрузки и перезагрузки модулей без перезапуска сервера, а также получения статистики о загруженных модулях.  | *base, feature-loading-system, iobject, ioc* |
+|  | security | Модуль содержит интерфейсы и их реализации для кодировщиков, а также актор с базовой функциональностью шифрования паролей. | *base* |
+|  | security-plugins | Модуль содержит плагин, регистрирующий стратегии работы с базовыми кодеками и шифрованием паролей. | *base, feature-loading-system, ioc,* **security** |
+|  | statistics | Модуль реализует функциональность сбора статистики о функционировании компонентов платформы. | *base, iobject, ioc, message-processing-interfaces, task, configuration-manager,* **timer, message-bus, scheduler** |
+|  | statistics-plugins | Модуль содержит плагины, регистрирующие актор и стратегии для функциональности сбора статистики о функционировании компонентов платформы. | *base, feature-loading-system, iobject, ioc, message-processing-interfaces,* **statistics** |
 |  | testing |  |  |
 |  | testing-plugins |  |  |
 
