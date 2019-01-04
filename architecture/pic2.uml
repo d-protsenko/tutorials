@@ -1,4 +1,4 @@
-@startuml
+﻿@startuml
 
 rectangle "Ядро платформы" as core {
 
@@ -35,12 +35,12 @@ component "version-management-plugins" as vermgmtplgn
 
 base <-down- classmanagement
 
-iobject <-left- ioc
-scope <-down- ioc
-
 base <-down- iobject
 
 base <-down- scope
+
+iobject <-down- ioc
+scope <-down- ioc
 
 classmanagement <-down- featureloadingsystem
 
@@ -53,7 +53,6 @@ iocstrtgpck <-down- iocstrtgpckplgn
 featureloadingsystem <-down- iocstrtgpckplgn
 
 ioc <-down- messageprocessinginterfaces
-iobject <-down- messageprocessinginterfaces
 
 iobject <-down- cfgmgr
 
@@ -63,83 +62,67 @@ featureloadingsystem <-down- cfgmgrplgn
 
 cfgmgr <-down- coresrvstarter
 task <-down- coresrvstarter
-messageprocessinginterfaces <-down- coresrvstarter
 featureloadingsystem <-down- coresrvstarter
 iobjectextension <-down- coresrvstarter
 
 iobject <-down- dmpinterface
 
-messageprocessinginterfaces <-down- featuremngmnt
 ioc <-down- featuremngmnt
 task <-down- featuremngmnt
 featureloadingsystem <-down- featuremngmnt
 
-iobject <-down- field
+ioc <-down- field
 
 field <-down- fldplgn
 featureloadingsystem <-down- fldplgn
 ioc <-down- fldplgn
 
 ioc <-down- iobjplgn
-iobject <-down- iobjplgn
 featureloadingsystem <-down- iobjplgn
 
 ioc <-down- iobjectextension
-iobject <-down- iobjectextension
 
 iobjectextension <-down- iobjextplgn
-ioc <-down- iobjextplgn
 featureloadingsystem <-down- iobjextplgn
 
-messageprocessinginterfaces <-down- msgprocessing
-task <-down- msgprocessing
+field <-down- msgprocessing
+shutdown <-down- msgprocessing
 iobjectextension <-down- msgprocessing
 
-iobject <-down- messageprocessingplugins
-ioc <-down- messageprocessingplugins
 featureloadingsystem <-down- messageprocessingplugins
 msgprocessing <-down- messageprocessingplugins
 
-messageprocessinginterfaces <-down- onfeatureloadsrvstarter
 cfgmgr <-down- onfeatureloadsrvstarter
 task <-down- onfeatureloadsrvstarter
 featureloadingsystem <-down- onfeatureloadsrvstarter
-iobject <-down- onfeatureloadsrvstarter
-iobjectextension <-down- onfeatureloadsrvstarter
+ioc <-down- onfeatureloadsrvstarter
 
 featureloadingsystem <-down- scopeplgn
 scope <-down- scopeplgn
 ioc <-down- scopeplgn
 
 task <-down- shutdown
-scopeplgn <-down- shutdown
-iocplgn <-down- shutdown
-iobjplgn <-down- shutdown
+ioc <-down- shutdown
 
 featureloadingsystem <-down- shutdownplgn
-messageprocessinginterfaces <-down- shutdownplgn
 cfgmgr <-down- shutdownplgn
 shutdown <-down- shutdownplgn
 
+dmpinterface <-down- task
 scope <-down- task
 classmanagement <-down- task
-msgprocessing <-down- task
+messageprocessinginterfaces <-down- task
 
 task <-down- taskplgn
 featureloadingsystem <-down- taskplgn
 ioc <-down- taskplgn
 
-ioc <-down- vermgmnt
 task <-down- vermgmnt
-classmanagement <-down- vermgmnt
-scope <-down- vermgmnt
 msgprocessing <-down- vermgmnt
 
 featureloadingsystem <-down- vermgmtplgn
 vermgmnt <-down- vermgmtplgn
 
 }
-
-
 
 @enduml
