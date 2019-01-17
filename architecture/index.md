@@ -117,7 +117,7 @@ maven-проектов:
 
 ## Архитектура ядра
 
-Схема зависимостей модулей ядра платформы представлена следующей диаграммой
+Схема зависимостей модулей ядра платформы представлена следующей диаграммой:
 
 ![Core Architecture](core_schema_ru.png "Схема зависимостей модулей ядра платформы")
 
@@ -161,8 +161,11 @@ maven-проектов:
 
 ## Архитектура системного слоя
 
-Архитектура системного слоя платформы представлена следующей 
-диаграммой
+Схема зависимостей системного слоя платформы представлена следующей 
+диаграммой:
+
+![Core Features Architecture](corefeatures_schema_ru.png "Схема зависимостей модулей системного слоя платформы")
+
 
 Таблица со списком системных модулей и их кратким описанием 
 (в список зависимостей не включены модули, от которых зависят 
@@ -170,6 +173,8 @@ maven-проектов:
 
 | | Модуль | Описание | Зависимости | 
 | ---: | :--- | --- | --- | 
+|  | morph-expressions | Модуль содержит интерфейсы и реализует функциональность синтаксического анализатора лексем. | * * |
+|  | helpers | Модуль содержит базовый абстрактный класс для классов авто-тестов модуля, которым для работы требуется загружать плагины других модулей. | *feature-loading-system* |
 |  | dumpable-plugins | Модуль содержит плагин, регистрирующий стратегию создания сериализованной копии объекта через интерфейс dumpable. | *base, feature-loading-system, dumpable-interface, ioc* |
 |  | timer | Модуль содержит интерфейс и реализует функциональность таймера. | *base, class-management, ioc, task* |
 |  | timer-plugins | Модуль содержит плагин, регистрирующий стратегии работы с таймером. | *base, feature-loading-system, ioc,* **timer** |
@@ -195,23 +200,21 @@ maven-проектов:
 |  | https-endpoint | Модуль реализует функциональность ввода-вывода сообщений по протоколу https. | *iobject, ioc,* **endpoint, http-endpoint** |
 |  | https-endpoint-plugins | Модуль содержит плагины, регистрирующие объекты и стратегии для обработки сообщений, полученных через https-точку ввода-вывода (https-endpoint). | *base, feature-loading-system, message-processing-interfaces, iobject, ioc,* **endpoint, https-endpoint, http-endpoint-plugins** |
 |  | database-service-starter | Модуль реализует фунциональность обработки секции database в файле конфигурациии, а также плагин, регистрирующий соответствующую стратегию в менеджере конфигураций (configuration-manager). | *base, feature-loading-system, ioc, configuration-manager, message-processing-interfaces, task, message-processing* |
-|  | database |  | *base, feature-loading-system, iobject, ioc, field, task,* **database-service-starter** |
-|  | database-plugins |  |  *feature-loading-system, ioc,* **database** |
+|  | database | Модуль содержит интерфейсы и реализует базовую функциональность для работы с базой данных. | *base, feature-loading-system, iobject, ioc, field, task,* **database-service-starter** |
+|  | database-plugins | Модуль содержит плагины, регистрирующие объекты и стратегии для работы с базой данных. |  *feature-loading-system, ioc,* **database** |
 |  | in-memory-database-service-starter | Модуль реализует фунциональность обработки секции inMemoryDb в файле конфигурациии, а также плагин, регистрирующий соответствующую стратегию в менеджере конфигураций (configuration-manager). | *iobject, configuration-manager,* **database** |
-|  | database-in-memory |  | *base, iobject, ioc, task, ioc-strategy-pack,* **database, in-memory-database-starter** |
-|  | database-in-memory-plugins |  | *base, feature-loading-system, iobject, ioc,* **database-in-memory, database-plugins** |
-|  | database-postgresql |  | *base, iobject, ioc,* **database** |
-|  | database-postgresql-plugins |  | *base, feature-loading-system, iobject, ioc, ioc-strategy-pack,* **database-postgresql, database-plugins** |
-|  | database-postgresql-async-ops-collection |  | *base, feature-loading-system, iobject, ioc, ioc-strategy-pack,* **database, database-postgresql, database-plugins, database-postgresql-plugins** |
-|  | database-postgresql-cached-collection |  | *base, feature-loading-system, iobject, ioc, ioc-strategy-pack,* **database, database-postgresql, database-plugins, database-postgresql-plugins** |
-|  | database-null-connection-pool-plugins |  | *base, feature-loading-system, ioc,* **database** |
-|  | global-constants-service-starter | Модуль реализует фунциональность обработки секции const в файле конфигурациии, а также плагин, регистрирующий соответствующую стратегию в менеджере конфигураций (configuration-manager). | *base, feature-loading-system, message-processing-interfaces, iobject, ioc, configuration-manager, task, message-processing,* |
-|  | debugger |  |  |
-|  | debugger-plugins |  |  |
-|  | helpers |  |  |
-|  | morph-expressions |  |  |
-|  | testing |  |  |
-|  | testing-plugins |  |  |
+|  | database-in-memory | Модуль реализует функциональность работы с базой данных в оперативной памяти. | *base, iobject, ioc, task, ioc-strategy-pack,* **database, in-memory-database-starter** |
+|  | database-in-memory-plugins | Модуль содержит плагины, регистрирующие объекты и стратегии для работы с базой данных в оперативной памяти. | *base, feature-loading-system, iobject, ioc,* **database-in-memory, database-plugins** |
+|  | database-postgresql | Модуль реализует функциональность работы с базой данных postgresql. | *base, iobject, ioc,* **database** |
+|  | database-postgresql-plugins | Модуль содержит плагины, регистрирующие объекты и стратегии для работы с базой данных postgresql. | *base, feature-loading-system, iobject, ioc, ioc-strategy-pack,* **database-postgresql, database-plugins** |
+|  | database-postgresql-async-ops-collection | *В настоящее время модуль не функционален. Требуется доработка.* | *base, feature-loading-system, iobject, ioc, ioc-strategy-pack,* **database, database-postgresql, database-plugins, database-postgresql-plugins** |
+|  | database-postgresql-cached-collection | *В настоящее время модуль не функционален. Требуется доработка.* | *base, feature-loading-system, iobject, ioc, ioc-strategy-pack,* **database, database-postgresql, database-plugins, database-postgresql-plugins** |
+|  | database-null-connection-pool-plugins | Модуль реализует функциональность эмулятора работы с базой данных для использования в тестах. | *base, feature-loading-system, ioc,* **database** |
+|  | global-constants-service-starter | Модуль реализует фунциональность обработки секции const в файле конфигурациии, а также плагин, регистрирующий соответствующую стратегию в менеджере конфигураций (configuration-manager). | *base, feature-loading-system, message-processing-interfaces, iobject, ioc, configuration-manager, task, message-processing* |
+|  | debugger | Модуль реализует функциональность отладчика пользовательских приложений. | *base, class-management, dumpable-interface, iobject, ioc, message-processing-interfaces* |
+|  | debugger-plugins | Модуль содержит плагины, регистрирующие объекты и стратегии для отладки пользовательских приложений. | *base, feature-loading-system, iobject, ioc, message-processing-interfaces,* **debugger, endpoint-plugins** |
+|  | testing | Модуль содержит базовую функциональность для создания автоматизированных тестов пользовательских приложений. | *base, class-management, message-processing-interfaces, iobject, ioc, configuration-manager, task,* **endpoint** |
+|  | testing-plugins | Модуль содержит плагины, регистрирующие объекты и стратегии базовой функциональности для автоматизированных тестов пользовательских приложений. | *base, feature-loading-system, iobject, ioc,* **testing** |
 
 ## Подробное описание модулей ядра и системных модулей
 
