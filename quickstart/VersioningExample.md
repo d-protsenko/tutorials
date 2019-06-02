@@ -72,11 +72,11 @@ resolve chain version from message.
 Please see below the example how to register such strategy in feature plugin:
 
         IFieldName versionFN = IOC.resolve(
-                Keys.getOrAdd("info.smart_tools.smartactors.iobject.ifield_name.IFieldName"), 
+                Keys.getKeyByName("info.smart_tools.smartactors.iobject.ifield_name.IFieldName"), 
                 "msgVersion"
         );
         IOC.resolve(
-                Keys.getOrAdd("register_message_version_strategy"),
+                Keys.getKeyByName("register_message_version_strategy"),
                 "chain-name",
                 new ApplyFunctionToArgumentsStrategy(args -> {
                     IObject message = (IObject) args[0];
@@ -93,11 +93,11 @@ field "msgVersion", but you may use any other way. The example of selecting vers
 depending on presence of some field in message:
  
         IFieldName someParamFN = IOC.resolve(
-                Keys.getOrAdd("info.smart_tools.smartactors.iobject.ifield_name.IFieldName"), 
+                Keys.getKeyByName("info.smart_tools.smartactors.iobject.ifield_name.IFieldName"), 
                 "someParameter"
         );
         IOC.resolve(
-                Keys.getOrAdd("register_message_version_strategy"),
+                Keys.getKeyByName("register_message_version_strategy"),
                 "chain-name",
                 new ApplyFunctionToArgumentsStrategy(args -> {
                     IObject message = (IObject) args[0];

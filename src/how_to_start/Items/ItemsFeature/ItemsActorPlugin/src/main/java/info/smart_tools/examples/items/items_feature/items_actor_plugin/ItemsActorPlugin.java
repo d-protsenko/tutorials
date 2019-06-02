@@ -9,7 +9,7 @@ import info.smart_tools.smartactors.feature_loading_system.interfaces.ibootstrap
 import info.smart_tools.smartactors.ioc.iioccontainer.exception.RegistrationException;
 import info.smart_tools.smartactors.ioc.iioccontainer.exception.ResolutionException;
 import info.smart_tools.smartactors.ioc.ioc.IOC;
-import info.smart_tools.smartactors.ioc.named_keys_storage.Keys;
+import info.smart_tools.smartactors.ioc.key_tools.Keys;
 
 public class ItemsActorPlugin extends BootstrapPlugin {
 
@@ -25,7 +25,7 @@ public class ItemsActorPlugin extends BootstrapPlugin {
     public void init()
             throws ResolutionException, RegistrationException, InvalidArgumentException {
         IOC.register(
-                Keys.getOrAdd("ItemsActor"),    // the unique name of the actor in IOC
+                Keys.getKeyByName("ItemsActor"),    // the unique name of the actor in IOC
                 new ApplyFunctionToArgumentsStrategy(
                         a -> {
                             try {

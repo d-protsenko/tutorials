@@ -34,7 +34,7 @@ For das installation following pre-installed application are needed:
 [Download](http://archiva.smart-tools.info/#artifact~server-dev-tools/info.smart_tools.smartactors/das) and install the debian package :
 
 ```console
-$ sudo dpkg -i das-0.3.2.deb
+$ sudo dpkg -i das-0.6.0.deb
 ```
 
 Check das:
@@ -47,7 +47,7 @@ The result should be:
 
 ```console
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.2.
+Version 0.6.0.
 ```
 
 Use the command `cs` (create server) to create the server. This command supports the following arguments:
@@ -77,7 +77,7 @@ and check the created server structure. It should be the following:
     |   | -- ..
     |-- features
     |   | -- ..
-     -- server-0.3.2.jar (version of jar file may differ)
+     -- server-0.6.0.jar (version of jar file may differ)
 ```
 
 Use the command `dc` (download core) to download the core pack. This command supports the following arguments:
@@ -96,14 +96,14 @@ Run:
 $ das dc -path ~/servers/MyServer
 ```
 
-Go to the `~/servers/MyServer/core` and check the directory core isn’t empty and contains some directories like a `base-0.3.2`, `ioc-0.3.2`, etc...
+Go to the `~/servers/MyServer/core` and check the directory core isn’t empty and contains some directories like a `base-0.6.0`, `ioc-0.6.0`, etc...
 
 The server is installed.
 
 Use the following command to run the server:
 
 ```console
-$ java -jar ~/servers/MyServer/server-0.3.2.jar
+$ java -jar ~/servers/MyServer/server-0.6.0.jar
 ```
 
 The result should be:
@@ -131,7 +131,7 @@ The result should be:
 
 ```console
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.2.
+Version 0.6.0.
 Creating project ...
 Project has been created successful.
 ```
@@ -154,7 +154,7 @@ The result should be:
 
 ```console
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.2.
+Version 0.6.0.
 Creating feature ...
 Feature has been created successful.
 ```
@@ -177,7 +177,7 @@ The result should be:
 
 ```console
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.2.
+Version 0.6.0.
 Creating actor ...
 Actor has been created successful.
 ```
@@ -288,7 +288,7 @@ The result should be:
 
 ```
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.2.
+Version 0.6.0.
 Creating plugin ...
 Plugin has been created successful.
 ```
@@ -315,7 +315,7 @@ import info.smart_tools.smartactors.feature_loading_system.interfaces.ibootstrap
 import info.smart_tools.smartactors.ioc.iioccontainer.exception.RegistrationException;
 import info.smart_tools.smartactors.ioc.iioccontainer.exception.ResolutionException;
 import info.smart_tools.smartactors.ioc.ioc.IOC;
-import info.smart_tools.smartactors.ioc.named_keys_storage.Keys;
+import info.smart_tools.smartactors.ioc.key_tools.Keys;
 
 public class NewActorPlugin extends BootstrapPlugin {
 
@@ -332,7 +332,7 @@ public class NewActorPlugin extends BootstrapPlugin {
    public void doSomeThing()
            throws ResolutionException, RegistrationException, InvalidArgumentException {
        IOC.register(
-               Keys.getOrAdd("NewActor"),
+               Keys.getKeyByName("NewActor"),
                new ApplyFunctionToArgumentsStrategy(
                        a -> {
                            try {

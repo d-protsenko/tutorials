@@ -22,7 +22,7 @@ In tests you can construct IFieldName using trivial implementation and `new` ope
 However, the recommended way to get IFieldName is to resolve it from [IOC](IOCExample.html).
 
     IFieldName fieldName = IOC.resolve(
-            Keys.getOrAdd(IFieldName.class.getCanonicalName()),
+            Keys.getKeyByName(IFieldName.class.getCanonicalName()),
             "name");
 
 You need the initialized IOC and a plugin which registers the appropriate strategy to resolve IFieldName.
@@ -81,7 +81,7 @@ In tests you can create the trivial implementation of IField from IFieldName.
 However, it's recommended to resolve the IField from IOC.
 
     IField field = IOC.resolve(
-            Keys.getOrAdd(IField.class.getCanonicalName()),
+            Keys.getKeyByName(IField.class.getCanonicalName()),
             "name");
 
 You need the initialized IOC and a plugin which registers the appropriate strategy to resolve IFieldName.
@@ -140,12 +140,12 @@ Note, the recommended way to create a new IObject is to resolve it from IOC.
 You can resolve empty IObject.
 
     IObject object = IOC.resolve(
-            Keys.getOrAdd(IObject.class.getCanonicalName()));
+            Keys.getKeyByName(IObject.class.getCanonicalName()));
 
 You can resolve IObject from JSON string.
 
     IObject object = IOC.resolve(
-            Keys.getOrAdd(IObject.class.getCanonicalName()),
+            Keys.getKeyByName(IObject.class.getCanonicalName()),
             "{ \"name\": \"value\" }");
 
 You need the initialized IOC and a plugin which registers the appropriate strategies to create IObject from IOC.
@@ -156,7 +156,7 @@ For example, [PluginDSObject](../apidocs/info/smart_tools/smartactors/plugin/dso
 DSObject implementation of IObject can be serialized to JSON String.
 
     IObject object = IOC.resolve(
-            Keys.getOrAdd(IObject.class.getCanonicalName()),
+            Keys.getKeyByName(IObject.class.getCanonicalName()),
             "{ \"name\": \"value\" }");
     assertEquals("{\"name\":\"value\"}", object.serialize());
 
@@ -178,7 +178,7 @@ But it case of conversion from JSON you need to know the Java types of the objec
 JSON objects in curly braces are always presented as IObject.
 
     IObject object = IOC.resolve(
-            Keys.getOrAdd(IObject.class.getCanonicalName()),
+            Keys.getKeyByName(IObject.class.getCanonicalName()),
             "{ \"name\": { \"nested\": \"object\" } }");
     IObject value = field.in(object);
 
@@ -187,7 +187,7 @@ JSON objects in curly braces are always presented as IObject.
 Strings are represented as String.
 
     IObject object = IOC.resolve(
-            Keys.getOrAdd(IObject.class.getCanonicalName()),
+            Keys.getKeyByName(IObject.class.getCanonicalName()),
             "{ \"name\": \"value\" }");
     String value = field.in(object);
 
@@ -198,7 +198,7 @@ so numeric values in JSON can be presented as Integer, Long, Double or even BigD
 It's always safe to retrieve them as Number.
 
     IObject object = IOC.resolve(
-            Keys.getOrAdd(IObject.class.getCanonicalName()),
+            Keys.getKeyByName(IObject.class.getCanonicalName()),
             "{ \"int\": 42, \"float\": 42.42 }");
     Number intValue = intField.in(object);
     assertEquals(42, intValue.intValue());
@@ -208,7 +208,7 @@ It's always safe to retrieve them as Number.
 Or you can use conversion abilities of Field to convert to necessary type.
 
     IObject object = IOC.resolve(
-            Keys.getOrAdd(IObject.class.getCanonicalName()),
+            Keys.getKeyByName(IObject.class.getCanonicalName()),
             "{ \"value\": 42.42 }");
     Integer intValue = field.in(object, Integer.class);
     Double doubleValue = field.in(object, Double.class);
@@ -221,7 +221,7 @@ You should use [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) String represe
 and retrieve them as [LocalDateTime](http://docs.oracle.com/javase/8/docs/api/java/time/LocalDateTime.html).
 
     IObject object = IOC.resolve(
-            Keys.getOrAdd(IObject.class.getCanonicalName()),
+            Keys.getKeyByName(IObject.class.getCanonicalName()),
             "{ \"date\": \"2016-08-22T13:38:42\" }");
     LocalDateTime dateTime = field.in(object, LocalDateTime.class);
 
@@ -232,7 +232,7 @@ If it's array of objects, it'll be `List<IObject>`,
 if it's array of strings, it'll be `List<String>`, etc...
 
     IObject object = IOC.resolve(
-            Keys.getOrAdd(IObject.class.getCanonicalName()),
+            Keys.getKeyByName(IObject.class.getCanonicalName()),
             "{ \"array\": [ \"a\", \"b\", \"c\" ] }");
     List<String> array = field.in(object);
     assertEquals("a", array.get(0));

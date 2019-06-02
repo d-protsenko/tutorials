@@ -15,15 +15,15 @@ __SmartActors__, __DAS__, __Distributed Actor System__ — the framework you're 
 
 __das__ — the command line tool `das` which helps to initialize the Server and creates source code templates and the project structure.
 
-__Server__ — you need a Server where you put your compiled code and it'll run it.
+__Server__ — you need a Server where you put your compiled code and Server will run your code.
 
-__Core__, __Core Pack__ — the initial set of classes (in jars) necessary to start the Server from scratch.
+__Core__, __Core Pack__ — the initial set of classes (in jars) which is necessary to start the Server from scratch.
 
-__Project__ — it's presumed you work in some Project, to create some Features and Actors to run they in the Server. The source code of the Project is located in a folder, separated from the SmartActors sources or where you run your Server. The Project can be built by a single command.
+__Project__ — it's presumed you work in some Project, to create some Features and Actors to run then on the Server. The source code of the Project is located in a folder separated from the SmartActors sources or place where you run your Server. The Project can be built by a single command.
 
-__Feature__ — a named set of functionality (Actors, Plugins and Maps) to run in the Server. Typically are distributed as zip archives, are extracted to separated folders by the Server. A Feature may depend on other Features.
+__Feature__ — a named set of functionality (Actors, Plugins and Maps) to run on the Server. Typically are distributed as zip archives, are extracted to separated folders by the Server. A Feature may depend on other Features.
 
-__Core Feature__ — a Feature, provided by the SmartActors developers. As any Feature, it gives a new functionality to the Server. It's downloaded automatically when the Server starts. Core Features provide some basic functionality to the Server, while ordinary Features add some specific business logic.
+__Core Feature__ — a Feature, provided by the SmartActors core developers. As any Feature, it gives a new functionality to the Server. It's downloaded automatically when the Server starts. Core Features provide some basic functionality to the Server, while ordinary Features add some specific business logic.
 
 __Actor__ — a Java class which provides the minimal, independent and atomic set of functionality. Actors should be combined to Maps (or Chains) to do something useful within a Feature. Actors in the map receives and sends messages to each other.
 
@@ -49,14 +49,14 @@ You need [OpenJDK](http://openjdk.java.net/install/index.html) 8 or later to run
 
 You need [Apache Maven](https://maven.apache.org/install.html) 3 or later to build your Project.
 
-You need access to http://archiva.smart-tools.info to download necessary packages.
+You need access to http://repository.smart-tools.info to download necessary packages.
 
 Download and install `das` utility.
 
-* Download [deb package](http://archiva.smart-tools.info/repository/server-dev-tools/info/smart_tools/smartactors/das/0.3.3/das-0.3.3.deb).
+* Download [deb package](https://repository.smart-tools.info/artifactory/smartactors_development_tools/info/smart_tools/smartactors/das/0.6.0/das-0.6.0.deb).
 * Install it with `dpkg` command.
     ```console
-    $ sudo dpkg -i das-0.3.3.deb
+    $ sudo dpkg -i das-0.6.0.deb
     ```
 
 You need a good text editor or an IDE like [IntelliJ IDEA](https://www.jetbrains.com/idea/) to write a code.
@@ -68,7 +68,7 @@ Make sure the `das` utility is installed correctly.
 ```console
 $ das
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.3.
+Version 0.6.0.
 ```
 
 This Project is to make a simple application to keep in memory a list of items. The application has methods to add new items and list all of them. Think of items as a simplest abstraction for, for example, blog posts, etc...
@@ -82,7 +82,7 @@ Create the new Project folder, use `cp` subcommand. The Project name is "Items".
 ```console
 $ das cp -pn Items -g info.smart_tools.examples.items
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.3.
+Version 0.6.0.
 Creating project ...
 Project has been created successful.
 ```
@@ -113,7 +113,7 @@ Create the new Feature, use `cf` subcommand. The Feature name is "ItemsFeature".
 ```console
 $ das cf -fn ItemsFeature
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.3.
+Version 0.6.0.
 Creating feature ...
 Feature has been created successful.
 ```
@@ -144,7 +144,7 @@ Create the new Actor, use `ca` subcommand. The actor name is "ItemsActor". It's 
 ```console
 $ das ca -an ItemsActor -fn ItemsFeature
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.3.
+Version 0.6.0.
 Creating actor ...
 Actor has been created successful.
 ```
@@ -385,7 +385,7 @@ Create the new Plugin, use `cpl` subcommand. The Plugin name is "ItemsActorPlugi
 ```console
 $ das cpl -pln ItemsActorPlugin -fn ItemsFeature
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.3.
+Version 0.6.0.
 Creating plugin ...
 Plugin has been created successful.
 ```
@@ -417,7 +417,7 @@ import info.smart_tools.smartactors.feature_loading_system.interfaces.ibootstrap
 import info.smart_tools.smartactors.ioc.iioccontainer.exception.RegistrationException;
 import info.smart_tools.smartactors.ioc.iioccontainer.exception.ResolutionException;
 import info.smart_tools.smartactors.ioc.ioc.IOC;
-import info.smart_tools.smartactors.ioc.named_keys_storage.Keys;
+import info.smart_tools.smartactors.ioc.key_tools.Keys;
 
 public class ItemsActorPlugin extends BootstrapPlugin {
 
@@ -433,7 +433,7 @@ public class ItemsActorPlugin extends BootstrapPlugin {
     public void init()
             throws ResolutionException, RegistrationException, InvalidArgumentException {
         IOC.register(
-                Keys.getOrAdd("ItemsActor"),    // the unique name of the actor in IOC
+                Keys.getKeyByName("ItemsActor"),    // the unique name of the actor in IOC
                 new ApplyFunctionToArgumentsStrategy(
                         a -> {
                             try {
@@ -577,7 +577,7 @@ Create the new Feature named "EndpointConfiguration".
 ```console
 $ das cf -fn EndpointConfiguration
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.3.
+Version 0.6.0.
 Creating feature ...
 Feature has been created successful.
 ```
@@ -671,7 +671,7 @@ Create here the folder of the Server. Use `cs` subcommand. The Server name is "I
 ```console
 $ das cs -sn ItemsServer
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.3.
+Version 0.6.0.
 Creating server ...
 ... some warnings skipped ...
 Server has been created successful.
@@ -697,7 +697,7 @@ Use subcommand `dc` to download core jars for the Server. Point the path to the 
 ```console
 $ das dc -path ItemsServer
 Distributed Actor System. Design, assembly and deploy tools.
-Version 0.3.3.
+Version 0.6.0.
 Download server core ...
 ... some warnings skipped ...
 Server core has been downloaded successful.
@@ -707,12 +707,12 @@ Now the Server's "core" folder contains downloaded core libraries.
 
 ```console
 $ ls ItemsServer/core
-base-0.3.3                           feature-management-0.3.3         iobject-plugins-0.3.3            message-processing-interfaces-0.3.3       task-plugins.non-blocking-queue-0.3.3
-configuration-manager-0.3.3          field-0.3.3                      ioc-0.3.3                        message-processing-plugins-0.3.3          utility-tools-0.3.3
-configuration-manager-plugins-0.3.3  field-plugins-0.3.3              ioc-plugins-0.3.3                on-feature-loading-service-starter-0.3.3
-core-service-starter-0.3.3           iobject-0.3.3                    ioc-strategy-pack-0.3.3          scope-0.3.3
-dumpable-interface-0.3.3             iobject-extension-0.3.3          ioc-strategy-pack-plugins-0.3.3  scope-plugins-0.3.3
-feature-loading-system-0.3.3         iobject-extension-plugins-0.3.3  message-processing-0.3.3         task-0.3.3
+base-0.6.0                           feature-management-0.6.0         iobject-plugins-0.6.0            message-processing-interfaces-0.6.0       task-plugins.non-blocking-queue-0.6.0
+configuration-manager-0.6.0          field-0.6.0                      ioc-0.6.0                        message-processing-plugins-0.6.0          utility-tools-0.6.0
+configuration-manager-plugins-0.6.0  field-plugins-0.6.0              ioc-plugins-0.6.0                on-feature-loading-service-starter-0.6.0
+core-service-starter-0.6.0           iobject-0.6.0                    ioc-strategy-pack-0.6.0          scope-0.6.0
+dumpable-interface-0.6.0             iobject-extension-0.6.0          ioc-strategy-pack-plugins-0.6.0  scope-plugins-0.6.0
+feature-loading-system-0.6.0         iobject-extension-plugins-0.6.0  message-processing-0.6.0         task-0.6.0
 ```
 
 ### Add core Features
@@ -725,56 +725,56 @@ Where to download the core Features and ids of their artifacts must be listed in
 {
   "repositories": [
     {
-      "repositoryId": "archiva.smartactors-features",
+      "repositoryId": "smartactors_core_and_core_features",
       "type": "default",
-      "url": "http://archiva.smart-tools.info/repository/smartactors-features/"
+      "url": "https://repository.smart-tools.info/artifactory/smartactors_core_and_core_features/"
     }
   ],
   "features": [
     {
       "group": "info.smart_tools.smartactors",
       "name": "http-endpoint",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "http-endpoint-plugins",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "endpoint",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "endpoint-plugins",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "endpoint-service-starter",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "message-bus",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "message-bus-service-starter",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "timer",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "timer-plugins",
-      "version": "0.3.3"
+      "version": "0.6.0"
     }
   ]
 }

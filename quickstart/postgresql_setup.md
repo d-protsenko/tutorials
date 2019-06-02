@@ -25,14 +25,14 @@ For example, your `corefeatures/features.json` could look like:
 {
   "repositories": [
     {
-      "repositoryId": "archiva.smartactors-features",
+      "repositoryId": "smartactors_core_and_core_features",
       "type": "default",
-      "url": "http://archiva.smart-tools.info/repository/smartactors-features/"
+      "url": "https://repository.smart-tools.info/artifactory/smartactors_core_and_core_features/"
     },
     {
-      "repositoryId": "archiva.common-features",
+      "repositoryId": "smartactors_common_features",
       "type": "default",
-      "url": "http://archiva.smart-tools.info/repository/common-features/"
+      "url": "https://repository.smart-tools.info/artifactory/smartactors_common_features/"
     }
   ],
   "features": [
@@ -41,32 +41,32 @@ For example, your `corefeatures/features.json` could look like:
     {
       "group":"info.smart_tools.smartactors",
       "name": "database-service-starter",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "database",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "database-plugins",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "database-postgresql",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "database-postgresql-plugins",
-      "version": "0.3.3"
+      "version": "0.6.0"
     },
     {
       "group": "info.smart_tools.smartactors",
       "name": "database-postgresql-create-collection-if-not-exists",
-      "version": "0.3.3"
+      "version": "0.6.0"
     }
   ]
 }
@@ -152,12 +152,12 @@ You have registered options and created collections. How to use them?
 To do database tasks you need to have an `IPool` object, to get it use this snippet:
 
 ```java
-final ConnectionOptions options = IOC.resolve(Keys.getOrAdd("PostgresConnectionOptions")); // you can get this key from message for example!!
-final IPool pool = IOC.resolve(Keys.getOrAdd("PostgresConnectionPool"), options);
+final ConnectionOptions options = IOC.resolve(Keys.getKeyByName("PostgresConnectionOptions")); // you can get this key from message for example!!
+final IPool pool = IOC.resolve(Keys.getKeyByName("PostgresConnectionPool"), options);
 String collectionName = "example_collection_1";
 try (PoolGuard guard = new PoolGuard(pool)) {
     ITask task = IOC.resolve(
-            Keys.getOrAdd(SOME_TASK_ID),
+            Keys.getKeyByName(SOME_TASK_ID),
             guard.getObject(),
             collectionName,
             message.getOptions()

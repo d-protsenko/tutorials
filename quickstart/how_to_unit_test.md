@@ -25,11 +25,11 @@ For example we have an actor requires SomeService.
 
 ```java
 import info.smart_tools.smartactors.ioc.ioc.IOC;
-import info.smart_tools.smartactors.ioc.named_keys_storage.Keys;
+import info.smart_tools.smartactors.ioc.key_tools.Keys;
 
 public class SomeActor {
     public void handler(SomeActorWrapper wrapper) throws Exception {
-        SomeService service = IOC.resolve(Keys.getOrAdd("SomeService"));
+        SomeService service = IOC.resolve(Keys.getKeyByName("SomeService"));
         service.doStuff();
         // some other code
     }
@@ -46,7 +46,7 @@ import info.smart_tools.smartactors.iobject.ifield_name.IFieldName;
 import info.smart_tools.smartactors.iobject.iobject.IObject;
 import info.smart_tools.smartactors.ioc.ioc.IOC;
 import info.smart_tools.smartactors.ioc.istrategy_container.IStrategyContainer;
-import info.smart_tools.smartactors.ioc.named_keys_storage.Keys;
+import info.smart_tools.smartactors.ioc.key_tools.Keys;
 import info.smart_tools.smartactors.ioc.resolve_by_name_ioc_with_lambda_strategy.ResolveByNameIocStrategy;
 import info.smart_tools.smartactors.ioc.strategy_container.StrategyContainer;
 import info.smart_tools.smartactors.ioc.string_ioc_key.Key;
@@ -92,7 +92,7 @@ public class SomeActorTest {
                         }
                 )
         );
-        IOC.register(Keys.getOrAdd(IObject.class.getCanonicalName()),
+        IOC.register(Keys.getKeyByName(IObject.class.getCanonicalName()),
                 new ApplyFunctionToArgumentsStrategy(args -> {
                     if (args.length == 0) {
                         return new DSObject();
@@ -111,7 +111,7 @@ public class SomeActorTest {
         // Now we can add our dependency
         SomeService someService = mock(SomeService.class);
         when(someService.doStuff()).thenReturn("good boy!");
-        IOC.register(Keys.getOrAdd("SomeService"),
+        IOC.register(Keys.getKeyByName("SomeService"),
                 new ApplyFunctionToArgumentsStrategy(args -> someService)
         );
     }

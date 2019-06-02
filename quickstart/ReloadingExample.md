@@ -89,12 +89,12 @@ routing:
             {
                 "group": "info.smart_tools.smartactors",
                 "name": "endpoint",
-                "version": "0.3.3"
+                "version": "0.6.0"
             },
             {
                 "group": "info.smart_tools.smartactors",
                 "name": "endpoint-plugins",
-                "version": "0.3.3"
+                "version": "0.6.0"
             }
         ]
     }
