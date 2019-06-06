@@ -109,20 +109,20 @@ A `IPluginLoaderVisitor` is necessary to track plugins loading process.
 
     IPluginLoaderVisitor<String> visitor = new SamplePluginVisitor();
 
-### ClassLoader    
+### ModuleManager    
 
-Because the plugin jars can be located in different directories and can be added dynamically, the special kind of [ClassLoader](http://docs.oracle.com/javase/8/docs/api/java/lang/ClassLoader.html) is required.
+Because the plugin jars can be located in different directories and can be added dynamically, the special object named 'module' needs to be created to store each plugin inside the server.
 
-    ClassLoader urlClassLoader =
-                    new ExpansibleURLClassLoader(new URL[]{}, ClassLoader.getSystemClassLoader());
+    ModuleManager.addModule( pluginId, pluginName, pluginVersion );
 
 ### PluginLoader
 
-Then the `PluginLoader` is created.
-It's second constructor parameter is the code to load each plugin.
+Then this 'module' for plugin must be setup as current and `PluginLoader` is created.
+The second constructor's parameter is the code to load each plugin.
 
+    ModuleManager.setCurrentModule(ModuleManager.getModuleById(pluginId));
     IPluginLoader<Collection<IPath>> pluginLoader = new PluginLoader(
-            urlClassLoader,
+            ModuleManager.getCurrentClassLoader(),
             (t) -> {
                 try {
                     IPlugin plugin = creator.create(t, bootstrap);

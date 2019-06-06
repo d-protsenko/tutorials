@@ -15,19 +15,21 @@ in message processing and clarifies the scope and module context switching conce
  
 ## How to enable/disable Feature Versioning
 
-The Feature Versioning is enabled by default when you download servers core using `das dc`
-command. You may make sure of this by checking of presence modules `version-management` and
+The Feature Versioning is included by default when you download server's core using `das dc`
+command. You may make sure of this by checking presence of modules `version-management` and
 `version-management-plugin` in `core` directory of your Smartactors server.
 Then on server startup Feature Versioning is enabled by default.
 
 To disable Feature Versioning on your server you may just remove modules 
-`version-management` and `version-management-plugin` from `core` server directory.
+`version-management` and `version-management-plugin` from `core` server directory and
+then restart the server.
 
 If Feature Versioning is disabled then server does not differentiate feature, chain 
-and actor versions and overwrites them on [`Feature Reloading`](FeatureReloading.html). 
+and actor versions and overwrites them on [`Feature Reloading`](ReloadingExample.html). 
 Also IOC registrations become not isolated by features dependency hierarchy.
-In case of [`Feature Reloading`](FeatureReloading.html) the chains and actors of feature 
-are always overwritten, as far as IOC registrations.
+In case of [`Feature Reloading`](ReloadingExample.html) without Feature Versioning 
+the chains and actors of feature are always overwritten by newly loaded chains and actors 
+with same names, as far as IOC registrations.
 
 ## Setup Feature Version
 
@@ -140,7 +142,7 @@ For chains it means that if you registered something in IOC in dependent feature
 chain from base feature then this chain and its actors will not be affected by your 
 IOC registrations because scope and module context are switched on chain call.
 
-If you actor is executed in some module (feature) context then it may see all IOC registrations
+If your actor is executed in some module (feature) context then it may see all IOC registrations
 done in this module context and upward on all module contexts of the modules which this module
 depends on. 
 

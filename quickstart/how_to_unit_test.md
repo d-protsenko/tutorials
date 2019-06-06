@@ -70,7 +70,7 @@ public class SomeActorTest {
         ScopeProvider.setCurrentScope(scope);
         // Something we HAVE TO REGISTER ALWAYS
         IOC.register(
-                IOC.getKeyForKeyStorage(),
+                IOC.getKeyForKeyByNameStrategy(),
                 new ResolveByNameIocStrategy(
                         (a) -> {
                             try {
@@ -81,7 +81,7 @@ public class SomeActorTest {
                         })
         );
         IOC.register(
-                IOC.resolve(IOC.getKeyForKeyStorage(), IFieldName.class.getCanonicalName()),
+                IOC.resolve(IOC.getKeyForKeyByNameStrategy(), IFieldName.class.getCanonicalName()),
                 new ApplyFunctionToArgumentsStrategy(
                         (args) -> {
                             try {

@@ -33,7 +33,7 @@ You should do the following to perform a database query.
             other comma-separated parameters        // the set of parameters depends on the command
         );
 
-    If the dependency cannot be resolved, `IOC.resolve` throws `ResolveDependencyException`.
+    If the dependency cannot be resolved, `IOC.resolve` throws `ResolutionException`.
 
 2. Execute the task.
 
@@ -166,7 +166,7 @@ If the document with such id does not exist, the `TaskExecutionException` is thr
                     System.out.println("Found by id");
                     System.out.println((String) doc.serialize());
                 } catch (SerializeException e) {
-                    throw new ActionExecuteException(e);
+                    throw new ActionExecutionException(e);
                 }
             }
     );
@@ -334,7 +334,7 @@ You define the pair: the document field name and the sort direction: "asc" or "d
                         System.out.println((String) doc.serialize());
                     }
                 } catch (SerializeException e) {
-                    throw new ActionExecuteException(e);
+                    throw new ActionExecutionException(e);
                 }
             }
     );

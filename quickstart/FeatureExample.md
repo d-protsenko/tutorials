@@ -14,11 +14,11 @@ The [`Feature`](../apidocs/info/smart_tools/smartactors/core/ifeature_manager/IF
 
 ## Feature of Plugins
 
-Imagine we have a an example feature which requires two plugins to be loaded. Create a server which initialization is delayed until both plugin JARs appeared in the 'libs' folder.
+Imagine we have an example feature which requires two plugins to be loaded. Create a server which initialization is delayed until both plugin JARs appeared in the 'libs' folder.
 
 ### Plugins initialization
 
-The code to initialize Plugins stays the same as in [plugins example]((PluginExample.html)). However it will be called only when all necessary JARs appeared.
+The code to initialize Plugins stays the same as in [plugins example](PluginExample.html). However it will be called only when all necessary JARs appeared.
 
 ### Filesystem tracker
 
