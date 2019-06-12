@@ -311,19 +311,6 @@ However, it's better to define the language for the fulltext query explicitly.
         }
     }
 
-The query can be more complex to join search terms with different conditions.
-
-    {
-        "filter": {
-            "$fulltext": {
-                "query": {
-                    "$or": [ "term1",  "term2" ]
-                },
-                "language": "english"
-            }
-        }
-    }
-
 ##### Page
 
 Page criterion is used for pagination.
