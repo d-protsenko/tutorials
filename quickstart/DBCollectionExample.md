@@ -80,7 +80,36 @@ Available index types:
 * `fulltext` — full text index, requires additional `language` option, use it to optimize `$fulltext` search operator.
 
 Ordered, datetime and tags indexes are created for each field independently, so queries for all specified fields can be done in any combination.
-However, fulltext index is only one for the collection, the texts from all specified fields are concatenated for the indexing.
+However, only one fulltext index can be created for each language, the texts from all specified fields are concatenated for the indexing.
+Note that `english` language is used for full text index creation if no language specified in options.
+
+### Add indexes
+
+Adds the indexes to the collection in database to speed up corresponding queries.
+
+Command name: `db.collection.addindexes`, `db.collection.addindexessafe` 
+
+Parameters:
+
+- options — `IObject` — object specifying the set of options for the index creation.
+
+The format of options for this command is same as for `db.collection.create` command.
+Similarly to `db.collection.create` indexes can be created in any combinations.
+Note that `db.collection.addindexessafe` command run inside SQL transaction, so the
+collection is locked until the command finished. 
+
+### Drop indexes
+
+Drops the previously created indexes in database.
+
+Command name: `db.collection.dropindexes` 
+
+Parameters:
+
+- options — `IObject` — object specifying the set of options for the index dropping.
+
+The format of options for this command is same as for `db.collection.create` command.
+Similarly to `db.collection.create` indexes can be dropped in any combinations.
 
 ### Upsert
 
