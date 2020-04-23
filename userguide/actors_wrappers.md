@@ -20,7 +20,7 @@ group: userguide
 * В имени актора должно отсутствовать слово `Actor`
 * Имя актора должно описывать его предназначение
 * Название хэндлера должно описывать само действие
-* Название обертки описывает предназначение хэндлера, в котором она используется, должна содержать слово `Wrapper`
+* Название обертки описывает предназначение хэндлера, в котором она используется, должна содержать слово `Message`
 * Название поля обертки должно описывать сущность, которую она ждет
 * При регистрации в IoC-контейнере в качестве ключа зависимости не должно использоваться имя актора
 
@@ -28,7 +28,7 @@ group: userguide
 * Имя актора - `PageCriteriaBuilder`
 * В IoC-контейнере актор зарегистрирован как `"page criteria builder"`
 * Название хэндлера - `build`
-* Обертка `BuildPageCriteriaWrapper` содержит следующие поля:
+* Обертка `BuildPageCriteriaMessage` содержит следующие поля:
     * `IObject getSearchCriteria()` - тело критериев поиска
     * `Integer getPageSize()` - размер страницы
     * `Integer getPageNumber()` - номер страницы
@@ -45,20 +45,20 @@ group: userguide
 Т.е. ситуаций, аналогичной той, что приведена ниже, быть не должно
 
 ```java
-interface BuildObjectWrapper {}
+interface BuildObjectMessage {}
 
-public void build(final BuildObjectWrapper wrapper)
-public void buildEmpty(final BuildObjectWrapper wrapper)
+public void build(final BuildObjectMessage message)
+public void buildEmpty(final BuildObjectMessage message)
 ```
 
 Вместо этого, должна быть дописана ещё одна обертка, строго заточенная для другого хэндлера.
 
 ```java
-interface BuildObjectWrapper {}
-interface BuildEmptyObjectWrapper {}
+interface BuildObjectMessage {}
+interface BuildEmptyObjectMessage {}
 
-public void build(final BuildObjectWrapper wrapper)
-public void buildEmpty(final BuildEmptyObjectWrapper wrapper)
+public void build(final BuildObjectMessage message)
+public void buildEmpty(final BuildEmptyObjectMessage message)
 ```
 
 ### Исключения

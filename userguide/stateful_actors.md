@@ -21,7 +21,7 @@ group: userguide
 #### Пример
 На практике описанное выше выглядит следующим образом. Конструктор имеет следующий вид:
 ```java
-public GetDocumentsExecutor(final InitialWrapper wrapper) throws InitializationException {
+public GetDocumentsExecutor(final GetDocumentsConfig wrapper) throws InitializationException {
     String connectionOptionsName = wrapper.getConnectionOptionsName();
     String connectionPoolName = wrapper.getConnectionPoolName();
     String collectionName = wrapper.getCollectionName();
@@ -32,7 +32,7 @@ public GetDocumentsExecutor(final InitialWrapper wrapper) throws InitializationE
 
 Обертка, соответственно, имеет следующий вид:
 ```java
-public interface InitialWrapper {
+public interface GetDocumentsConfig {
     String getConnectionOptionsName() throws ReadValueException;
     String getConnectionPoolName() throws ReadValueException;
     String getCollectionName() throws ReadValueException;
@@ -43,9 +43,9 @@ public interface InitialWrapper {
 В плагине, где происходит регистрация актора, информацию о полях можно получить из вариативных аргументов `args` в лямбде стратегии, конфигурация актора для конкретной цепочки будет лежать под нулевым индексом. Процесс передачи данных в конструктор актора будет иметь следующий вид:
 
 ```java
-IObject config = (IObject) args[0];
+IObject configurationObject = (IObject) args[0];
 
-InitialWrapper wrapper = new InitialWrapper() {
+GetDocumentsConfig config = new GetDocumentsConfig() {
 
     @Override
     String getConnectionOptionsName() throws ReadValueException {
@@ -68,7 +68,7 @@ InitialWrapper wrapper = new InitialWrapper() {
     }
 };
 
-return new GetDocumentsExecutor(wrapper);
+return new GetDocumentsExecutor(config);
 ```
 
 **Замечание:** для упрощения примера тут не продемонстрировано формирование IFieldName, регистрация в IOC и обработка исключений.
@@ -121,11 +121,11 @@ private String host;
 private String port;
 private String protocol;
 
-public EmailSender(final InitialWrapper wrapper) {
+public EmailSender(final EmailSenderConfig config) {
     // заполнение внутреннего состояние
 }
 
-public void send(final SendEmailWrapper wrapper) {
+public void send(final SendEmailMessage message) {
     // отправка почты через почтовый сервер, информация о котором лежит в памяти
 }
 ```
@@ -137,15 +137,15 @@ private String host;
 private String port;
 private String protocol;
 
-public EmailSender(final InitialWrapper wrapper) {
+public EmailSender(final EmailSenderConfig config) {
     // заполнение внутреннего состояние
 }
 
-public void send(final SendEmailWrapper wrapper) {
+public void send(final SendEmailMessage message) {
     // отправка почты через почтовый сервер, информация о котором лежит в памяти
 }
 
-public void updateSettings(final UpdateSettingsWrapper wrapper) {
+public void updateSettings(final UpdateSettingsMessage message) {
     this.host = wrapper.getHost();
     this.port = wrapper.getPort();
     this.protocol = wrapper.getProtocol();
