@@ -5,10 +5,11 @@ description: Documentation for SmartActors
 group: userguide
 ---
 
-# User Gude
+# User Guide
 
-Документация и общие рекомендации по разработке на SmartActors
+General documentation and recomendation for developing using SmartActors framework
 
+* [Code style and guidelines](code_style)
 * [Features and chains](features_and_chains)
 * [IOC dependencies](ioc_dependencies)
 * [Actors, wrappers](actors_wrappers)
