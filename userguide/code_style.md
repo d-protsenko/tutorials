@@ -118,6 +118,22 @@ private IFieldName roundsFN;
 private Integer hashRounds;
 ```
 
+### Strategies and rules
+* Transformation rule (or simply rule) or strategy must implement interface `IStrategy`
+* Rule naming guidelines:
+    * Rule must represent types it converts
+    * Rule class name is written in English using `UpperCamelCase` with `Rule` word added at the end
+* Strategy naming guidelines
+    * Strategy name represents what it supposed to perform
+    * Strategy class name is written in English using `UpperCamelCase` with `Strategy` word added at the end
+* Rules and strategies cannot have internal state, treat them as a pure functions
+
+**Example**:
+```java
+public StringToIntegerRule extends IStrategy {}
+public CreateObjectStrategy extends IStrategy {}
+```
+
 ### Plugins
 * Plugin is represented as a single class file
 * Only one plugin may be present in the source file
@@ -223,3 +239,16 @@ public class StatusCodeSetterPlugin extends BootstrapPlugin {
     * Chain name is representative of the action it's supposed to do
     * Chain name is written in English using `lisp-case`
     * Chain declaration must contain field `externalAccess` to clarify if this chain is external or not
+
+#### Collections
+* Collection naming guidelines:
+    * Collection name represents entity it stores
+    * Collection name written in English using `snake_case` style
+    * Collection name should be singular i.e. no plurals allowed
+* Collections should be created in the features where they're used
+
+**Example**: 
+```java
+"raw_data"
+"inactive_user_account"
+```
