@@ -37,6 +37,7 @@ _Before reading this guide, look through this instructions: [How to start using 
     |-- ServerParts
     |   |-- corefeatures
     |   |    |-- features.json
+    |   |-- core-pack.json
     |   |-- configuration.json
     |   |-- server.jar
     |-- etc...
