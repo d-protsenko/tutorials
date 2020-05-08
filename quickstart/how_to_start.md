@@ -23,7 +23,7 @@ __Project__ — it's presumed you work in some Project, to create some Features 
 
 __Feature__ — a named set of functionality (Actors, Plugins and Maps) to run on the Server. Typically are distributed as zip archives, are extracted to separated folders by the Server. A Feature may depend on other Features.
 
-__Core Feature__ — a Feature, provided by the SmartActors core developers. As any Feature, it gives a new functionality to the Server. It's downloaded automatically when the Server starts. Core Features provide some basic functionality to the Server, while ordinary Features add some specific business logic.
+__Core Feature__ — a Feature, provided by the SmartActors core developers. As any Feature, it gives a new functionality to the Server. It's downloaded automatically when the Server starts. Core Features provide some basic functionality to the Server, while ordinary Features add some specific business logic. They're usually listed in `corefeatures/features.json` file.
 
 __Actor__ — a Java class which provides the minimal, independent and atomic set of functionality. Actors should be combined to Maps (or Chains) to do something useful within a Feature. Actors in the map receives and sends messages to each other.
 
@@ -33,11 +33,13 @@ __Config__ — a `config.json` file, a part of a Feature. Configs from all loade
 
 __Map__, __Message Map__, __Chain__ — the list of actors in the specified order to process a message step by step. On each step the message is wrapped and passed to the Actor's handler, the Actor makes some modifications in the message atomically, then the message is passed to the next Actor. This is the core idea, how independent Actors work together.
 
-__Plugin__ — a part of a Feature, contains code to initialize the Feature, in most cases registers new strategies in IOC. Plugins may depend on other plugins.
+__Plugin__ — a part of a Feature, contains code to initialize on feature loading, in most cases registers new strategies in IOC.
 
 __IOC__, __Inversion of Control__, __IOC Container__ — global "storage" of all objects in the system. The preferable way to take an object in the system is to ask IOC to resolve some parameters and get the object reference.
 
 __Message Receiver__, __Receiver__ — an entity in the system able to receive and process messages. Technically Actor is also such kind of entity, but Actors also support Wrappers and some thread-safety guarantees.
+
+__Strategy__ — execution unit stored in IOC implementing `IStrategy` interface, which can be changed at runtime. Think of it like [strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern)
 
 __Endpoint__ — point of the server to receive incoming messages, for HTTP it's a TCP port accepting POSTed JSON documents.
 
@@ -56,7 +58,7 @@ To begin developing with SmartActors framework, you need the following:
     $ sudo dpkg -i das-0.6.0.deb
     ```
 * IDE like [IntelliJ IDEA](https://www.jetbrains.com/idea/) to write a code.
-* Template archetype for project feature, it can be accessed [here](https://github.com/SmartTools/feature-archetype). There you can also read how to install in into your system.
+* Template archetype for project feature, it can be accessed [here](https://github.com/SmartTools/feature-archetype). There you can also read how to install it into your system.
 
 ## Creating the project
 
@@ -148,6 +150,8 @@ public class ItemsStorageException extends Exception {
     }
 }
 ```
+
+Also note that some handlers may throw the same exception. For example, handlers for getting item and removing it may throw something like `ItemNotFoundException`.
 
 #### Writing wrappers
 
@@ -506,7 +510,7 @@ public class TestItemsStoragePlugin extends IOCInitializer {
 
 After writing actor, plugin and tests for them, we can finally work on configuring feature. Declare our actor in `objects` section of the feature like in the example below.
 
-Note that we're using `actor` as a kind, because we're dealing with stateful actor and we need to build up a query for handlers to process correctly. If actor does not require any query for handlers, then `stateless_actor` can be used.
+Note that we're using `"kind": "actor"`, because we're dealing with stateful actor and we need to build up a queue for handlers to process correctly. If actor does not require any queue for handlers, then `"stateless_actor"` can be used.
 
 ```json
 {

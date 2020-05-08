@@ -40,12 +40,6 @@ _Before reading this guide, look through this instructions: [How to start using 
     |   |-- core-pack.json
     |   |-- configuration.json
     |   |-- server.jar
-    |-- etc...
-    |   |-- nginx
-    |   |   |-- site.conf
-    |   |-- systemd
-    |   |   |-- project.conf
-    |   |-- ...
     |-- Makefile
     |-- README.md
     |-- .gitignore
@@ -215,6 +209,8 @@ build_docs_git:
 #### Feature compiling
 To compile only modified features, this script can be used.
 
+**Important note**: this feature will compile only those feature that can be seen with `git status` command. If feature does not appear as a result of checking status of project's git repository, it won't compile.
+
 ```bash
 #!/usr/bin/env bash
 
@@ -262,7 +258,7 @@ charset = utf-8
 indent_style = tab
 
 # Matches the exact files either package.json or .travis.yml
-[*.json]
+[*.{json,yml,yaml}]
 indent_style = space
 indent_size = 2
 
