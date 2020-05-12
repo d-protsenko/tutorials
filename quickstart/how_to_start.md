@@ -127,12 +127,13 @@ As you can see, it has 4 handlers, they allow end user to modify internal state 
 
 #### Writing exceptions
 
-When it comes to exceptions, you need to keep in mind that each handler and constructor should throw different exception. In this case, we'll have 5 exception classes:
+When it comes to exceptions, you need to keep in mind that each handler and constructor should throw different exception. In this case, we'll have 6 exception classes:
 * `ItemsStorageException` - exception for constructor
-* `GetItemException` - exception for `getItem()` handler
-* `SetItemException` - exception for `setItem()` handler
-* `RemoveItemException` - exception for `removeItem()` handler
-* `ClearStorageExcepton` - exception for `clearStorage()` handler
+* `GetItemException` - exception for `get()` handler
+* `SetItemException` - exception for `set()` handler
+* `RemoveItemException` - exception for `remove()` handler
+* `ClearStorageExcepton` - exception for `clear()` handler
+* `ItemNotFoundException` - exception for ``
 
 Since they're all mostly the same, this example will contain only one exception. But later in this document it's assumed that you have all 6 exceptions in your project.
 
@@ -150,8 +151,6 @@ public class ItemsStorageException extends Exception {
     }
 }
 ```
-
-Also note that some handlers may throw the same exception. For example, handlers for getting item and removing it may throw something like `ItemNotFoundException`.
 
 #### Writing wrappers
 
@@ -244,6 +243,8 @@ public interface ClearStorageMessage {
 #### Writing actor
 When we have all necessary exceptions and wrappers, we can start writing our actor. It must contain 4 handlers and constructor. Handlers must be `public void` and throw exception designated for them.
 
+As you can see, since `get` and `remove` handlers are basically the same, if they cannot find item in our storage, they'll throw an exception `ItemNotFoundException`. It will be useful for us later.
+
 ```java
 package com.example.your_project.items_storage.actors;
 
@@ -264,10 +265,13 @@ public class ItemsStorage {
         }
     }
 
-    public void get(final GetItemMessage message) throws GetItemException {
+    public void get(final GetItemMessage message) throws GetItemException, ItemNotFoundException {
         try {
             String key = message.getKey();
             String value = storage.get(key);
+            if (value == null) {
+                throw new ItemNotFoundException(String.format("Unable to find value for key %s", key));
+            }
             message.setValue(value);
         } catch (ReadValueException e) {
             throw new GetItemException("Unable to get key from the message", e);
@@ -286,10 +290,13 @@ public class ItemsStorage {
         }
     }
 
-    public void remove(final RemoveItemMessage message) throws RemoveItemException {
+    public void remove(final RemoveItemMessage message) throws RemoveItemException, ItemNotFoundException {
         try {
             String key = message.getKey();
             String value = storage.remove(key);
+            if (value == null) {
+                throw new ItemNotFoundException(String.format("Unable to remove value for key %s", key));
+            }
             message.setValue(value);
         } catch (ReadValueException e) {
             throw new RemoveItemException("Unable to get key from the message", e);
@@ -558,9 +565,11 @@ And here's comes another part in feature development - we need to write addition
 * `remove-item`
 * `clear-storage`
 
-And on top of that, we need additional feature, `endpoint-configuration`. This feature is necessary for our application to be able to receive requests and send responses. We'll write it in the first place.
+And on top of that, we need two additional features:
+- `endpoint-configuration` - this feature is necessary for our application to be able to receive requests and send responses. We'll write it in the first place.
+- `status-code-setter` - this feature contains the actor which sets provided status code to the response body. We'll use it to handle `ItemNotFoundException`.
 
-#### Endpoint configuration
+#### endpoint-configuration
 Run `make cf artId="endpoint-configuration" artPack="endpoint_configuration"` and remove `src` folder from generated feature, we won't need it in this feature. Modify it's `config.json` as in the code example below.
 
 ```json
@@ -610,23 +619,153 @@ Run `make cf artId="endpoint-configuration" artPack="endpoint_configuration"` an
 
 Here's what we're doing in this feature:
 - We're declaring that our feature `endpoint-configuraion` will load after features `http-endpoint-plugins` and `message-bus-plugins`
+- Endpoint can be acessed at port 9909
 - Chain `routing-chain` is used to route between different chains available in the project
 - We're limiting the size of the request, it should be no more than 4096 bytes
 - We're only able to go down as deep as 5 chains using various routing mechanisms
 
 Take a closer look at `externalAccess` field in chain configuration. This field declares if chain can be accessed from HTTP endpoint or not. We'll use it in features that access our actor.
 
+#### status-code-setter
+This feature contains one stateless actor - `StatusCodeSetter`. What it does is it sets HTTP status code to the response body. Since it doesn't depend on any other feature, there'll be no dependencies for it. Rather, features that need to set status code in response body will depend on it.
+
+```json
+{
+  "featureName": "com.example.your-project:status-code-setter",
+  "afterFeatures": []
+}
+```
+
+##### Actor and wrapper
+Since the actor is pretty simple, it will contain only one handler and only one wrapper. This wrapper will contain one getter and one setter. Note that getter returns `String` type instead of `Integer`.
+
+To avoid having large quick start tutorial, tests and JavaDocs for this actor and plugin are skipped, but they should be present in your project. Don't even think about pushing code without tests and JavaDocs to your repository :)
+
+**Source code** - `SetStatusCodeException.java`
+```java
+public class SetStatusCodeException extends Exception {
+    public SetStatusCodeException(final String message) {
+        super(message);
+    }
+
+    public SetStatusCodeException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+}
+```
+
+**Source code** - `SetStatusCodeMessage.java`
+```java
+package com.example.your_project.status_code_setter.actors;
+
+import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
+import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
+
+public interface SetStatusCodeMessage {
+    String getStatusCode() throws ReadValueException;
+
+    void setStatusCode(Integer statusCode) throws ChangeValueException;
+}
+```
+
+**Source code** - `StatusCodeSetter.java`
+```java
+package com.example.your_project.status_code_setter.actors;
+
+import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
+import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
+
+public class StatusCodeSetter {
+
+    public void set(final SetStatusCodeMessage message) throws SetStatusCodeException {
+        try {
+            String statusCode = message.getStatusCode();
+            message.setStatusCode(Integer.parseInt(statusCode));
+        } catch (ReadValueException e) {
+            throw new SetStatusCodeException("Unable to get status code from the message", e);
+        } catch (ChangeValueException e) {
+            throw new SetStatusCodeException("Unable to set status code to the message", e);
+        } catch (NumberFormatException e) {
+            throw new SetStatusCodeException("Unable to parse provided status code", e);
+        }
+    }
+}
+```
+
+##### Plugin
+**Source code** - `StatusCodeSetterPlugin.java`
+```java
+package com.example.your_project.status_code_setter.plugins;
+
+import info.smart_tools.smartactors.base.exception.invalid_argument_exception.InvalidArgumentException;
+import info.smart_tools.smartactors.base.strategy.apply_function_to_arguments.ApplyFunctionToArgumentsStrategy;
+import info.smart_tools.smartactors.feature_loading_system.bootstrap_plugin.BootstrapPlugin;
+import info.smart_tools.smartactors.feature_loading_system.interfaces.ibootstrap.IBootstrap;
+import info.smart_tools.smartactors.ioc.iioccontainer.exception.RegistrationException;
+import info.smart_tools.smartactors.ioc.iioccontainer.exception.ResolutionException;
+import info.smart_tools.smartactors.ioc.iioccontainer.exception.DeletionException;
+import info.smart_tools.smartactors.ioc.key_tools.Keys;
+import info.smart_tools.smartactors.ioc.ioc.IOC;
+import com.example.your_project.status_code_setter.actors.StatusCodeSetter;
+
+public class StatusCodeSetterPlugin extends BootstrapPlugin {
+
+    public StatusCodeSetterPlugin(final IBootstrap bootstrap) {
+        super(bootstrap);
+    }
+
+    @Item("status-code-setter-plugin")
+    public void init()
+            throws ResolutionException, RegistrationException, InvalidArgumentException {
+        IOC.register(Keys.getKeyByName("status code setter"), new ApplyFunctionToArgumentsStrategy(
+                args -> new StatusCodeSetter()
+        ));
+    }
+
+    @ItemRevert("status-code-setter-plugin")
+    public void unregister() throws ResolutionException, DeletionException {
+        IOC.unregister(Keys.getKeyByName("status code setter"));
+    }
+}
+```
+
 #### get-item feature
-To access `get` handler in our actor, we need to write chain that gives us the ability to get item from the `items-storage` actor and send it back to the user. Here's how it looks like:
+To access `get` handler in our actor, we need to write chain that gives us the ability to get item from the `items-storage` actor and send it back to the user. And we know that `get` handler may throw `ItemNotFoundException`. We'll handle it with our `StatusCodeSetter` actor using `exceptional` section in chain configuration.
 
 ```json
 {
   "featureName": "com.example.your-project:get-item",
   "afterFeatures": [
     "com.example.your-project:endpoint-configuration",
-    "com.example.your-project:items-storage"
+    "com.example.your-project:items-storage",
+    "com.example.your-project:status-code-setter"
+  ],
+  "objects": [
+    {
+      "name": "item-to-get-not-found-set-status-code",
+      "kind": "stateless_actor",
+      "dependency": "status code setter"
+    }
   ],
   "maps": [
+    {
+      "id": "get-item/item-not-found",
+      "externalAccess": false,
+      "steps": [
+        {
+          "target": "item-to-get-not-found-set-status-code",
+          "handler": "set",
+          "wrapper": {
+            "in_getStatusCode": "const/404",
+            "out_setStatusCode": "context/httpResponseStatusCode"
+          }
+        },
+        {
+          "target": "response-sender"
+        }
+      ],
+      "exceptional": []
+    },
     {
       "id": "get-item",
       "externalAccess": true,
@@ -643,7 +782,13 @@ To access `get` handler in our actor, we need to write chain that gives us the a
           "target": "response-sender"
         }
       ],
-      "exceptional": []
+      "exceptional": [
+        {
+          "class": "com.example.your_project.items_storage.actors.ItemNotFoundException",
+          "chain": "get-item/item-not-found",
+          "after": "break"
+        }
+      ]
     }
   ]
 }
@@ -689,16 +834,42 @@ To set new item or update existing one we'll create feature `set-item`, which wi
 Note that while we don't set anything to the `response` object, we still need to send some kind of the response to the user, otherwise he`ll receive `500 Internal Server Error`.
 
 #### remove-item feature
-To remove any existing item from the storage, we'll create `remove-item` feature.
+To remove any existing item from the storage, we'll create `remove-item` feature. Just like `get` handler, `remove` handler too may throw `ItemNotFoundException`, so we'll handle it accordingly.
 
 ```json
 {
   "featureName": "com.example.your-project:remove-item",
   "afterFeatures": [
     "com.example.your-project:endpoint-configuration",
-    "com.example.your-project:items-storage"
+    "com.example.your-project:items-storage",
+    "com.example.your-project:status-code-setter"
+  ],
+  "objects": [
+    {
+      "name": "item-to-remove-not-found-set-status-code",
+      "kind": "stateless_actor",
+      "dependency": "status code setter"
+    }
   ],
   "maps": [
+    {
+      "id": "remove-item/item-not-found",
+      "externalAccess": false,
+      "steps": [
+        {
+          "target": "item-to-remove-not-found-set-status-code",
+          "handler": "set",
+          "wrapper": {
+            "in_getStatusCode": "const/404",
+            "out_setStatusCode": "context/httpResponseStatusCode"
+          }
+        },
+        {
+          "target": "response-sender"
+        }
+      ],
+      "exceptional": []
+    },
     {
       "id": "remove-item",
       "externalAccess": true,
@@ -715,7 +886,13 @@ To remove any existing item from the storage, we'll create `remove-item` feature
           "target": "response-sender"
         }
       ],
-      "exceptional": []
+      "exceptional": [
+        {
+          "class": "com.example.your_project.items_storage.actors.ItemNotFoundException",
+          "chain": "remove-item/item-not-found",
+          "after": "break"
+        }
+      ]
     }
   ]
 }
@@ -776,6 +953,7 @@ Then you can test your application by sending POST requests with JSON body to `l
 
 ```bash
 $ curl --request POST \
+    --verbose \
     --url http://localhost:9909/ \
     --header 'content-type: application/json' \
     --data '{
@@ -783,7 +961,25 @@ $ curl --request POST \
   "key": "obj"
   }'
 
-$ {"value":null}
+$ *   Trying ::1:9909...
+  * TCP_NODELAY set
+  * Connected to localhost (::1) port 9909 (#0)
+  > POST / HTTP/1.1
+  > Host: localhost:9909
+  > User-Agent: curl/7.68.0
+  > Accept: */*
+  > content-type: application/json
+  > Content-Length: 50
+  > 
+  * upload completely sent off: 50 out of 50 bytes
+  * Mark bundle as not supporting multiuse
+  < HTTP/1.1 404 Not Found
+  < Content-Type: application/json
+  < Content-Length: 2
+  < Connection: keep-alive
+  < 
+  * Connection #0 to host localhost left intact
+$ {}
 ```
 
 **Adding new item and then getting it**
@@ -833,6 +1029,37 @@ $ curl --request POST \
   "key": "obj"
   }'
 $ {"value":null}
+```
+
+**Removing non-existing value**
+
+```bash
+$ curl --request POST \
+    --verbose \
+    --url http://localhost:9909/ \
+    --header 'content-type: application/json' \
+    --data '{
+  "messageMapId": "remove-item",
+  "key": "obj"
+  }'
+$ * TCP_NODELAY set
+  * Connected to localhost (::1) port 9909 (#0)
+  > POST / HTTP/1.1
+  > Host: localhost:9909
+  > User-Agent: curl/7.68.0
+  > Accept: */*
+  > content-type: application/json
+  > Content-Length: 53
+  > 
+  * upload completely sent off: 53 out of 53 bytes
+  * Mark bundle as not supporting multiuse
+  < HTTP/1.1 404 Not Found
+  < Content-Type: application/json
+  < Content-Length: 2
+  < Connection: keep-alive
+  < 
+  * Connection #0 to host localhost left intact
+$ {}
 ```
 
 **Clearing internal storage**
