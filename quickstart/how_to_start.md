@@ -49,7 +49,7 @@ To begin developing with SmartActors framework, you need the following:
 * Debian-based Linux distribution
 * [OpenJDK](http://openjdk.java.net/install/index.html) 8 run and compile.
   * **Note**: you need `jdk` packages, _not_ `jre`.
-* [Apache Maven](https://maven.apache.org/install.html) 3 or later to build your Project.
+* [Apache Maven](https://maven.apache.org/install.html) 3 or newer to build your Project.
 * Access to [feature repository](http://repository.smart-tools.info) to download necessary packages.
 * `das` utility:
   * Download [deb package](https://repository.smart-tools.info/artifactory/smartactors_development_tools/info/smart_tools/smartactors/das/0.6.0/das-0.6.0.deb).
@@ -106,11 +106,11 @@ API.md  bin.xml  config.json  pom.xml  README.md  src
 ```
 
 These are the files and directories located in the feature folder:
-* `API.md` - file describing API call for an external chain, if it exists in the feature,
+* `API.md` - file describing API call for externally accessible chain (i.e. chain that can be called from endpoint), if it exists in the feature.
 * `bin.xml` - configuration for feature distribution.
 * `config.json` - configuration file for the feature, where chains are located. It also helps SmartActors to resolve dependency tree on runtime.
 * `pom.xml` - since feature is basically a Maven module, this file describes feature as a Maven module. Here developer can add various dependencies, change the way feature is built, etc.
-* `README.md` - file with info about the feature
+* `README.md` - file with info about the feature, e.g. configuration files, required features (since feature may depend on other features), chain calls on feature loading, etc.
 * `src` - Java code of actors, plugins and other classes used in the feature.
 
 ### Actor and plugin
@@ -133,9 +133,9 @@ When it comes to exceptions, you need to keep in mind that each handler and cons
 * `SetItemException` - exception for `set()` handler
 * `RemoveItemException` - exception for `remove()` handler
 * `ClearStorageExcepton` - exception for `clear()` handler
-* `ItemNotFoundException` - exception for ``
+* `ItemNotFoundException` - general exception if item was not found
 
-Since they're all mostly the same, this example will contain only one exception. But later in this document it's assumed that you have all 6 exceptions in your project.
+Since they're all mostly the same, this example will contain only one exception class. But later in this document it's assumed that you have all 6 exceptions in your project.
 
 ```java
 package com.example.your_project.items_storage.actors;
@@ -154,12 +154,14 @@ public class ItemsStorageException extends Exception {
 
 #### Writing wrappers
 
-Wrappers are interfaces to the data the Actor need access to or provides.
+Wrappers are interfaces to the data the actor need access to or will produce.
 
 As we defined earlier, our actor contains 5 handlers plus constructor. It means that we'll have 6 wrappers - one for each handler and one for constructor. We'll describe each wrapper separately.
 
 ##### ItemsStorageConfig
-This wrapper is used in constructor for configuring stateful actors. In this case wrapper is pretty simple - we pass implementation of `Map` interface to the actor. Note that getter throws `ReadValueException`, if it's unable to get map.
+This wrapper is used for passsing configuration to the constructor of this actor. You should use wrappers like that in all your configurable actors.
+
+In this case wrapper is pretty simple - we pass implementation of `Map` interface to the actor. Note that getter throws `ReadValueException`, if it's unable to get map.
 
 ```java
 package com.example.your_project.items_storage.actors;
@@ -559,7 +561,7 @@ com.example.your-project:items-storage:0.1.0 - (OK)]
 
 If you see this, then your feature has been successfully loaded. However, there's one problem - we can't access it. Why we were writing so many handlers for the stateful actor, if we can't simply access it when the server started?
 
-And here's comes another part in feature development - we need to write additional features to access our newly written actor. We need to write 4 features:
+And here comes another part in feature development - we need to write additional features to access our newly written actor. We need to write 4 features:
 * `get-item`
 * `set-item`
 * `remove-item`
@@ -637,7 +639,7 @@ This feature contains one stateless actor - `StatusCodeSetter`. What it does is 
 ```
 
 ##### Actor and wrapper
-Since the actor is pretty simple, it will contain only one handler and only one wrapper. This wrapper will contain one getter and one setter. Note that getter returns `String` type instead of `Integer`.
+Since the actor is pretty simple, it will contain only one handler and only one wrapper. This wrapper will contain one getter and one setter.
 
 To avoid having large quick start tutorial, tests and JavaDocs for this actor and plugin are skipped, but they should be present in your project. Don't even think about pushing code without tests and JavaDocs to your repository :)
 
@@ -662,7 +664,7 @@ import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueExcepti
 import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
 
 public interface SetStatusCodeMessage {
-    String getStatusCode() throws ReadValueException;
+    Integer getStatusCode() throws ReadValueException;
 
     void setStatusCode(Integer statusCode) throws ChangeValueException;
 }
@@ -679,8 +681,8 @@ public class StatusCodeSetter {
 
     public void set(final SetStatusCodeMessage message) throws SetStatusCodeException {
         try {
-            String statusCode = message.getStatusCode();
-            message.setStatusCode(Integer.parseInt(statusCode));
+            Integer statusCode = message.getStatusCode();
+            message.setStatusCode(statusCode);
         } catch (ReadValueException e) {
             throw new SetStatusCodeException("Unable to get status code from the message", e);
         } catch (ChangeValueException e) {
@@ -794,9 +796,11 @@ To access `get` handler in our actor, we need to write chain that gives us the a
 }
 ```
 
-Before we'll do other chains, we need to discuss how actors are working in chains. In traditional actor model, message (which is basically a bunch of data) comes through special message bus, and actors take what they need, perform some action upon data and outputs back it to the message bus. In SmartActors this process is more linear - we still have message, actors, but they're places in a specific order of execution. So in this case `items-storage` actor will be called first, then `response-sender`.
+Before we'll do other chains, we need to discuss how actors are working in chains. In traditional actor model, actors take what they need from the message, perform some action upon data and outputs it back it to the message. When they output modified data back to the message, actor can also tell where this message should go next - either to other actors, or go back to itself and perform action upon data once more.
 
-To access message fields, `message/` prefix is used. It is where user request is stored, actors usually work with it. Prefix `response/` is basically the same as the message, but it will be send to the user after this chain is completed.
+In SmartActors this process is more linear - we still have message, actors, but they're placed in a specific order of execution by the message map (see [Routing Slip](https://www.enterpriseintegrationpatterns.com/patterns/messaging/RoutingTable.html) pattern). So in this case `items-storage` actor will be called first, then `response-sender`.
+
+To access message fields, `message/` prefix is used. It is where user request is stored, actors usually work with it. Prefix `response/` is basically the same as the message, but it will be sent to the user after this chain is completed.
 
 #### set-item feature
 To set new item or update existing one we'll create feature `set-item`, which will use `set` handler.
@@ -831,7 +835,7 @@ To set new item or update existing one we'll create feature `set-item`, which wi
 }
 ```
 
-Note that while we don't set anything to the `response` object, we still need to send some kind of the response to the user, otherwise he`ll receive `500 Internal Server Error`.
+Note that while we don't set anything to the `response` object, we still need to send some kind of the response to the user, otherwise he'll receive `500 Internal Server Error`.
 
 #### remove-item feature
 To remove any existing item from the storage, we'll create `remove-item` feature. Just like `get` handler, `remove` handler too may throw `ItemNotFoundException`, so we'll handle it accordingly.

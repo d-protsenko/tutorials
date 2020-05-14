@@ -16,8 +16,8 @@ To enforce code style in Java project, we recommend to use CheckStyle plugin in 
 * Lenght of the code line is limited with 120 characters
     * If code line is exceeding this limit, then it should be split
 * Block indentaion should be 4 spaces
-* Interface names are writted in `UpperCamelCase` style and contain `I` prefix in it.
-* Exceptions must be wrapped
+* Interface names are written in `UpperCamelCase` style and contain `I` prefix in it.
+* Exceptions must be caught and wrapped by method's specific exception
 * Exception message must describe the reason the exception was thrown
 
 **Example**:
@@ -39,14 +39,14 @@ try {
 * Actor naming guidelines:
     * Actor name is written in English, using no more than 4-6 words with `UpperCamelCase` style
     * Actor name does not contain word "Actor"
-    * Actor name represents what actor is supposed to do
+    * Actor name represents actor's purpose
 * Actor should not contain overloaded methods
 * Actor must be documented with JavaDoc
 
 **Example**: `StatusCodeSetter.java` with actor `StatusCodeSetter`
 
 #### Handlers
-* Handler must be of type `public void` and receive only one `final` parameter - wrapper
+* Handler must be of type `public void` and receive only one `final` parameter - message wrapper
 * Handler naming guidelines:
     * Handler name represents the action it supposed to do
     * Handler name is written in English with `lowerCamelCase` style
@@ -78,9 +78,9 @@ try {
     * Wrapper name represent the handler using it
     * Wrapper name is written in English with `UpperCamelCase` style and contain `Message` word in it
 * Getter and setter naming guidelines:
-    * Getter name represent the field it supposed to get from the message
-    * Getter name is writted in English with `lowerCamelCase` style and contain `get` word in the beginning
-    * Setter name represent the field it supposed to set in the message
+    * Getter name represent what kind of entity it supposed to get from the message
+    * Getter name is written in English with `lowerCamelCase` style and contain `get` word in the beginning
+    * Setter name represent what kind of entity it supposed to set to the message
     * Setter name is written in English with `lowerCamelCase` style and contain `set` word in the beginning
 * Wrapper itself must be documented with JavaDoc
 * Each getter and setter must be documented with JavaDoc
@@ -108,7 +108,7 @@ These are the wrappers used in stateful actor's constructors. They're mostly sim
 #### Internal state
 * Stateful actor's state is represented with private variables
 * To initialize private variables, constructor with configuration wrapper is used
-* Private variables are writted in English with `lowerCamelCase` style
+* Private variables are written in English with `lowerCamelCase` style
     * If private variable is a field name (i.e. it's of type `IFieldName`), then `FN` postfix must be appended
 * `static final` variables should be avoided
 
@@ -144,7 +144,7 @@ public CreateObjectStrategy extends IStrategy {}
     * This method should be marked with `@ItemRevert` annotation
 * Plugin naming guidelines:
     * Plugin name represent actor or strategy it supposed to register
-    * Plugin name is writter in English with `UpperCamelCase` style with `Plugin` word in it.
+    * Plugin name is written in English with `UpperCamelCase` style with `Plugin` word in it.
 * Plugin and it's methods must be documented with JavaDoc
 * Plugin's JavaDoc must contain info on how to resolve actor or strategy from IOC
 
@@ -191,7 +191,7 @@ public class StatusCodeSetterPlugin extends BootstrapPlugin {
 * Feature naming guidelines:
     * Feature name is representative of it's content - either it's a bundle of actors or it contains external chain
     * Feature name is written in English using `lisp-case`
-    * Feature name cannot contain word `feature` in it
+    * Feature name shouldn't contain word `feature` in it
 
 **Example**:
 * `database-search-criteria-builder` - feature with actors helping to build search criteria
@@ -223,7 +223,7 @@ public class StatusCodeSetterPlugin extends BootstrapPlugin {
 * Actor naming guidelines:
     * Actor name in feature is representative of the action it performs on the entity
     * Actor name is written in English using `lisp-case`
-    * Actor name cannot contain word `actor` in it
+    * Actor name shouldn't contain word `actor` in it
 * Structure of chain declaration in the feature is the following:
 
 ```json
