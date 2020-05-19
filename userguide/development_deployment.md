@@ -26,7 +26,7 @@ The good way to work on chains is to draft it before writing anything in `config
 * What actors are used in this chain?
 * Are there any actors that already exists and can be used in the chain?
 
-By answering these questions you can avoid nmay pitfalls like you suddenly need a new actor, old one isn't good enough, etc.
+By answering these questions you can avoid many pitfalls like you suddenly need a new actor, old one isn't good enough, etc.
 
 ### Versioning
 SmartActors allows to use different versions of each feature independently. The version of the feature is always present in the feature's name like this: `info.smart-tools:feature-name:0.1.0`. One way it could be used if there're multiple clients that aren't updated as frequently as the SmartActors application. By storing multiple versions of each feature we can avoid breaking functionality of these clients.
