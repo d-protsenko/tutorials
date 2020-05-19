@@ -1,0 +1,162 @@
+{
+  "repositories": [
+    {
+      "repositoryId": "smartactors_core_and_core_features_dev",
+      "type": "default",
+      "url": "https://repository.smart-tools.info/artifactory/smartactors_core_and_core_features_dev"
+    }
+  ],
+  "features": [
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "base",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "configuration-manager",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "configuration-manager-plugins",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "core-service-starter",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "dumpable-interface",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "feature-loading-system",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "feature-management",
+      "version": "0.6.1"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "field",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "field-plugins",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "iobject",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "iobject-plugins",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "iobject-extension",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "iobject-extension-plugins",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "ioc",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "ioc-plugins",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "ioc-strategy-pack",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "ioc-strategy-pack-plugins",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "message-processing-interfaces",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "message-processing",
+      "version": "0.6.1"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "message-processing-plugins",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "on-feature-loading-service-starter",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "scope",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "scope-plugins",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "task",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "task-plugins.non-blocking-queue",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "class-management",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "shutdown",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "shutdown-plugins",
+      "version": "0.6.0"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "version-management",
+      "version": "0.6.2"
+    },
+    {
+      "group": "info.smart_tools.smartactors",
+      "name": "version-management-plugins",
+      "version": "0.6.0"
+    }
+  ]
+}
+

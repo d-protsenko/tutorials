@@ -6,6 +6,7 @@ layout: page
 
 * [Basic architecture](architecture/)
 * [Quickstart guides](quickstart/)
+* [User Guide](userguide/)
 * [DAS tool](das/)
 
 # Other documentation

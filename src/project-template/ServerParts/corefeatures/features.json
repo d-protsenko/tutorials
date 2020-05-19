@@ -1,0 +1,117 @@
+{
+    "repositories": [
+      {
+        "repositoryId": "smartactors_common_features_dev",
+        "type": "default",
+        "url": "https://repository.smart-tools.info/artifactory/smartactors_common_features_dev/"
+      },
+      {
+        "repositoryId": "smartactors_core_and_core_features_dev",
+        "type": "default",
+        "url": "https://repository.smart-tools.info/artifactory/smartactors_core_and_core_features_dev/"
+      }
+    ],
+    "features": [
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "http-endpoint",
+        "version": "0.6.3"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "http-endpoint-plugins",
+        "version": "0.6.3"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "endpoint",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "endpoint-plugins",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "endpoint-service-starter",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "scheduler",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "scheduler-plugins",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "scheduler-auto-startup",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "dumpable-plugins",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "message-bus",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "message-bus-plugins",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "message-bus-service-starter",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "timer",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "timer-plugins",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "database-service-starter",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "database",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "database-plugins",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "database-postgresql",
+        "version": "0.6.3"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "database-postgresql-plugins",
+        "version": "0.6.0"
+      },
+      {
+        "group": "info.smart_tools.smartactors",
+        "name": "database-postgresql-create-collection-if-not-exists",
+        "version": "0.6.0"
+      }
+    ]
+  }
+  

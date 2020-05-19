@@ -13,7 +13,7 @@ Let start from some terms.
 
 __SmartActors__, __DAS__, __Distributed Actor System__ — the framework you're going to use here.
 
-__das__ — the command line tool `das` which helps to initialize the Server and creates source code templates and the project structure.
+__das__ — the command line tool `das` which helps to initialize the Server.
 
 __Server__ — you need a Server where you put your compiled code and Server will run your code.
 
@@ -23,7 +23,7 @@ __Project__ — it's presumed you work in some Project, to create some Features 
 
 __Feature__ — a named set of functionality (Actors, Plugins and Maps) to run on the Server. Typically are distributed as zip archives, are extracted to separated folders by the Server. A Feature may depend on other Features.
 
-__Core Feature__ — a Feature, provided by the SmartActors core developers. As any Feature, it gives a new functionality to the Server. It's downloaded automatically when the Server starts. Core Features provide some basic functionality to the Server, while ordinary Features add some specific business logic.
+__Core Feature__ — a Feature, provided by the SmartActors core developers. As any Feature, it gives a new functionality to the Server. It's downloaded automatically when the Server starts. Core Features provide some basic functionality to the Server, while ordinary Features add some specific business logic. They're usually listed in `corefeatures/features.json` file.
 
 __Actor__ — a Java class which provides the minimal, independent and atomic set of functionality. Actors should be combined to Maps (or Chains) to do something useful within a Feature. Actors in the map receives and sends messages to each other.
 
@@ -33,35 +33,34 @@ __Config__ — a `config.json` file, a part of a Feature. Configs from all loade
 
 __Map__, __Message Map__, __Chain__ — the list of actors in the specified order to process a message step by step. On each step the message is wrapped and passed to the Actor's handler, the Actor makes some modifications in the message atomically, then the message is passed to the next Actor. This is the core idea, how independent Actors work together.
 
-__Plugin__ — a part of a Feature, contains code to initialize the Feature, in most cases registers new strategies in IOC. Plugins may depend on other plugins.
+__Plugin__ — a part of a Feature, contains code to initialize on feature loading, in most cases registers new strategies in IOC.
 
 __IOC__, __Inversion of Control__, __IOC Container__ — global "storage" of all objects in the system. The preferable way to take an object in the system is to ask IOC to resolve some parameters and get the object reference.
 
 __Message Receiver__, __Receiver__ — an entity in the system able to receive and process messages. Technically Actor is also such kind of entity, but Actors also support Wrappers and some thread-safety guarantees.
 
+__Strategy__ — execution unit stored in IOC implementing `IStrategy` interface, which can be changed at runtime. Think of it like [strategy pattern](https://en.wikipedia.org/wiki/Strategy_pattern)
+
 __Endpoint__ — point of the server to receive incoming messages, for HTTP it's a TCP port accepting POSTed JSON documents.
 
 ## Requirements
 
-You need Debian-base Linux distribution.
-
-You need [OpenJDK](http://openjdk.java.net/install/index.html) 8 or later to run and compile. Note you need `jdk` packages, not `jre`.
-
-You need [Apache Maven](https://maven.apache.org/install.html) 3 or later to build your Project.
-
-You need access to http://repository.smart-tools.info to download necessary packages.
-
-Download and install `das` utility.
-
-* Download [deb package](https://repository.smart-tools.info/artifactory/smartactors_development_tools/info/smart_tools/smartactors/das/0.6.0/das-0.6.0.deb).
-* Install it with `dpkg` command.
-    ```console
+To begin developing with SmartActors framework, you need the following:
+* Debian-based Linux distribution
+* [OpenJDK](http://openjdk.java.net/install/index.html) 8 run and compile.
+  * **Note**: you need `jdk` packages, _not_ `jre`.
+* [Apache Maven](https://maven.apache.org/install.html) 3 or newer to build your Project.
+* Access to [feature repository](http://repository.smart-tools.info) to download necessary packages.
+* `das` utility:
+  * Download [deb package](https://repository.smart-tools.info/artifactory/smartactors_development_tools/info/smart_tools/smartactors/das/0.6.0/das-0.6.0.deb).
+  * Install it with `dpkg` command.
+    ```bash
     $ sudo dpkg -i das-0.6.0.deb
     ```
+* IDE like [IntelliJ IDEA](https://www.jetbrains.com/idea/) to write a code.
+* Template archetype for project feature, it can be accessed [here](https://github.com/SmartTools/feature-archetype). There you can also read how to install it into your system.
 
-You need a good text editor or an IDE like [IntelliJ IDEA](https://www.jetbrains.com/idea/) to write a code.
-
-## Create the Project
+## Creating the project
 
 Make sure the `das` utility is installed correctly.
 
@@ -73,521 +72,515 @@ Version 0.6.0.
 
 This Project is to make a simple application to keep in memory a list of items. The application has methods to add new items and list all of them. Think of items as a simplest abstraction for, for example, blog posts, etc...
 
-### Create the Project folder
+### Project folder
 
-Go to some folder where you'll put the Server folder and the Project folder.
+To create project folder all you need is to use `mkdir` command. Although there're some thing that you need to keep in mind:
+* Project folder must contain at least `Features` and `ServerParts` folders
+* All configuration for the project should be stored outside of these two folders
 
-Create the new Project folder, use `cp` subcommand. The Project name is "Items". The Maven groupId for the Project is "info.smart_tools.examples.items".
+For more detailed description on project structure, please refer to [this document](project_structure). It's also recommended to use Makefile from that document to help you with feature generation and server start. From this point on, we'll refer to that Makefile.
 
-```console
-$ das cp -pn Items -g info.smart_tools.examples.items
-Distributed Actor System. Design, assembly and deploy tools.
-Version 0.6.0.
-Creating project ...
-Project has been created successful.
+Also we recommend to check out the project template in `src/template` in tutorial's [repository](https://github.com/SmartTools/tutorials). You'll need all files available there in order to run the project.
+
+### Creating feature
+
+Go to project's folder:
+
+```bash
+$ cd project
 ```
 
-The new folder "Items" is created. Check it's content.
+Use this command to generate your first feature:
 
-```console
+```bash
+$ make cf artId="items-storage" artPack="items_storage"
+```
+
+Here we can see that we're creating a feature called `items-storage`, where we'll store our items in memory. Please note the difference in two arguments. `artId` arguments is for SmartActors framework, while `artPack` is the Java package.
+
+Check the content of the feature by going to the folder containing it:
+```bash
+$ cd Features/items-storage
 $ ls
-Items
-$ ls Items
-das.data  pom.xml
+API.md  bin.xml  config.json  pom.xml  README.md  src
 ```
 
-`das.data` file contains some metadata necessary for `das` utility to work correctly.
+These are the files and directories located in the feature folder:
+* `API.md` - file describing API call for externally accessible chain (i.e. chain that can be called from endpoint), if it exists in the feature.
+* `bin.xml` - configuration for feature distribution.
+* `config.json` - configuration file for the feature, where chains are located. It also helps SmartActors to resolve dependency tree on runtime.
+* `pom.xml` - since feature is basically a Maven module, this file describes feature as a Maven module. Here developer can add various dependencies, change the way feature is built, etc.
+* `README.md` - file with info about the feature, e.g. configuration files, required features (since feature may depend on other features), chain calls on feature loading, etc.
+* `src` - Java code of actors, plugins and other classes used in the feature.
 
-`pom.xml` file is the Maven parent module for your Project.
+### Actor and plugin
 
-### Create the Feature
+After we've created template for our feature, we already have some template code for us to handle. That will ease development process. We only need to modify that template code according to our needs.
 
-Go to the Project folder.
+So, what we need now is to create the actor which stores some data in the memory and gives access to it to the user.
 
-```console
-$ cd Items
-```
+Here's the diagram representation of this actor:
 
-Create the new Feature, use `cf` subcommand. The Feature name is "ItemsFeature".
+![Items storage actor](items-storage.png)
 
-```console
-$ das cf -fn ItemsFeature
-Distributed Actor System. Design, assembly and deploy tools.
-Version 0.6.0.
-Creating feature ...
-Feature has been created successful.
-```
+As you can see, it has 4 handlers, they allow end user to modify internal state of the actor. It's important to have these kind of handlers, since we're dealing with so called **stateful actor** - an actor with some state in it. After the project is compiled, there's no way to influence on it's state, so it's important to have handlers that allow to modify state.
 
-The new folder "ItemsFeature" is created. Check it's content.
+#### Writing exceptions
 
-```console
-$ ls
-das.data  ItemsFeature  pom.xml
-$ ls ItemsFeature
-config.json  ItemsFeatureDistribution  pom.xml
-$ ls ItemsFeature/ItemsFeatureDistribution
-bin.xml  pom.xml
-```
+When it comes to exceptions, you need to keep in mind that each handler and constructor should throw different exception. In this case, we'll have 6 exception classes:
+* `ItemsStorageException` - exception for constructor
+* `GetItemException` - exception for `get()` handler
+* `SetItemException` - exception for `set()` handler
+* `RemoveItemException` - exception for `remove()` handler
+* `ClearStorageExcepton` - exception for `clear()` handler
+* `ItemNotFoundException` - general exception if item was not found
 
-`config.json` is the initial configuration file for the Feature.
-
-The Feature is another Maven module with it's own `pom.xml`.
-
-"ItemsFeatureDistribution" folder contains another Maven module necessary to build zip archive for the Feature. `bin.xml` contains instructions to Maven plugins how to zip.
-
-Note that Project's `pom.xml` references Feature's `pom.xml` as a submodule. And also Feature references Distribution.
-
-### Create the Actor
-
-Create the new Actor, use `ca` subcommand. The actor name is "ItemsActor". It's located in the "ItemsFeature".
-
-```console
-$ das ca -an ItemsActor -fn ItemsFeature
-Distributed Actor System. Design, assembly and deploy tools.
-Version 0.6.0.
-Creating actor ...
-Actor has been created successful.
-```
-
-The new folder "ItemsActor" is created under the Feature folder. Check it's content.
-
-```console
-$ ls ItemsFeature
-config.json  ItemsActor  ItemsFeatureDistribution pom.xml
-$ ls ItemsFeature/ItemsActor
-pom.xml  src
-$ ls ItemsFeature/ItemsActor/src
-main  test
-$ ls ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/*
-ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/ItemsActor.java
-
-ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/exception:
-ItemsActorException.template
-
-ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/wrapper:
-ItemsActorWrapper.template
-```
-
-The new Maven module is created for the Actor. This module is a submodule of the Feature.
-
-### Write the code of the Actor
-
-It's time to open the whole Project in your IDE. Open the `pom.xml` in the Project folder as a Maven IDE project.
-
-Our Actor will keep the list of items in memory (as it's private field) and gives access to the list.
-It'll have two handlers (methods): to retrieve the whole list and to add a new item.
-
-Note in this case the Actor is the _owner_ of the items list. All operations over the list should be performed through this Actor.
-
-#### Write exceptions
-
-Typically each actor has it's own exception type thrown from its methods.
-
-Rename `ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/exception/ItemsActorException.template` into `ItemsActorException.java` and fill it with the content.
+Since they're all mostly the same, this example will contain only one exception class. But later in this document it's assumed that you have all 6 exceptions in your project.
 
 ```java
-package info.smart_tools.examples.items.items_feature.items_actor.exception;
+package com.example.your_project.items_storage.actors;
 
-public class ItemsActorException extends Exception {
-
-    public ItemsActorException(final String message) {
+public class ItemsStorageException extends Exception {
+    
+    public ItemsStorageException(final String message) {
         super(message);
     }
 
-    public ItemsActorException(final String message, final Throwable cause) {
+    public ItemsStorageException(final String message, final Throwable cause) {
         super(message, cause);
     }
-
-    public ItemsActorException(final Throwable cause) {
-        super(cause);
-    }
 }
 ```
 
-Note that you can define more than one exception, specific for each exceptional case in your Actor.
+#### Writing wrappers
 
-#### Write wrappers
+Wrappers are interfaces to the data the actor need access to or will produce.
 
-Wrappers are interfaces to the data the Actor need access to or provides.
+As we defined earlier, our actor contains 5 handlers plus constructor. It means that we'll have 6 wrappers - one for each handler and one for constructor. We'll describe each wrapper separately.
 
-Because our Actor has two handlers, we should define two wrappers: to get all items and to add a new item.
+##### ItemsStorageConfig
+This wrapper is used for passsing configuration to the constructor of this actor. You should use wrappers like that in all your configurable actors.
 
-Copy and rename `ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/wrapper/ItemsActorWrapper.template` into `GetAllItemsWrapper.java` and `AddNewItemWrapper.java`.
-
-`GetAllItemsWrapper` is the interface with a method to set a list of items. These are data going _out from_ the Actor, so the Actor should _set_ the list to the processing message.
-
-```java
-package info.smart_tools.examples.items.items_feature.items_actor.wrapper;
-
-import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
-
-import java.util.List;
-
-
-public interface GetAllItemsWrapper {
-
-    /**
-     * The Actors sets of list of all items here.
-     * @throws ChangeValueException when the set fails
-     */
-    void setAllItems(final List<String> items)
-            throws ChangeValueException;
-
-}
-```
-
-`AddNewItemWrapper` is the interface with a method to _get_ a new item name. These are data going _into_ the Actor, so the Actor should _get_ them from the processing message.
+In this case wrapper is pretty simple - we pass implementation of `Map` interface to the actor. Note that getter throws `ReadValueException`, if it's unable to get map.
 
 ```java
-package info.smart_tools.examples.items.items_feature.items_actor.wrapper;
+package com.example.your_project.items_storage.actors;
 
 import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
 
-public interface AddNewItemWrapper {
+import java.util.Map;
 
-    /**
-     * The gets the new item name here.
-     * @return the new item name
-     * @throws ReadValueException when the get fails
-     */
-    String getNewItemName()
-            throws ReadValueException;
+public interface ItemsStorageConfig {
+    
+    Map<String, String> getMap() throws ReadValueException;
 }
 ```
 
-Note getters and setters of the Wrapper must throw `ReadValueException` and `ChangeValueException` respectively.
+Please note that while source code for wrappers for handlers are generated in runtime, you'll have to write code for wrapper for constructor by yourself. But we'll touch that in plugin section of this documentation
 
-#### Write the Actor
-
-Take the file `ItemsFeature/ItemsActor/src/main/java/info/smart_tools/examples/items/items_feature/items_actor/ItemsActor.java` and modify it.
-
-It's necessary to add two methods: to retrieve all items and to add a new item. Each method takes one argument with the necessary Wrapper type and returns `void`. Each method throws the specific exception.
+##### GetItemMessage
+This wrapper is used in handler for getting single item from the storage. It has one getter and one setter.
 
 ```java
-package info.smart_tools.examples.items.items_feature.items_actor;
+package com.example.your_project.items_storage.actors;
 
-import info.smart_tools.examples.items.items_feature.items_actor.exception.ItemsActorException;
-import info.smart_tools.examples.items.items_feature.items_actor.wrapper.AddNewItemWrapper;
-import info.smart_tools.examples.items.items_feature.items_actor.wrapper.GetAllItemsWrapper;
 import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
 import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+public interface GetItemMessage {
+    
+    String getKey() throws ReadValueException;
+    
+    void setValue(String value) throws ChangeValueException;
+}
+```
 
-public class ItemsActor {
+As it was said before, source code for wrappers for handlers is generated in runtime. It means that there're certain criteria for wrappers. You can see it in exceptions that are thrown by each field.
 
-    private final List<String> items = new ArrayList<>();
+##### SetItemMessage
+This wrapper is used in handler for adding new or updating existing item in the storage.
 
-    /**
-     * Retrieves the list of all items.
-     * @param wrapper the wrapper where to set the list
-     * @throws ItemsActorException if something goes wrong
-     */
-    public void getAllItems(final GetAllItemsWrapper wrapper) throws ItemsActorException {
+```java
+package com.example.your_project.items_storage.actors;
+
+import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
+
+public interface SetItemMessage {
+
+    String getKey() throws ReadValueException;
+
+    String getValue() throws ReadValueException;
+}
+```
+
+##### RemoveItemMessage
+This wrapper is used in handler for removing item from the storage
+
+```java
+package com.example.your_project.items_storage.actors;
+
+import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
+import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
+
+public interface RemoveItemMessage {
+
+    String getKey() throws ReadValueException;
+
+    void setValue(String value) throws ChangeValueException;
+}
+```
+
+Note that it's almost exactly the same as `GetItemMessage`, but with different name. If we're dealing with actor with several handlers, each handler must use wrapper designated for it. Even if it means that there will be duplicates like this.
+
+##### ClearStorageMessage
+This wrapper is used in handler for clearing internal storage. And because this handler does not require any additional fields, this wrapper is left empty, without any field.
+
+```java
+package com.example.your_project.items_storage.actors;
+
+public interface ClearStorageMessage {
+}
+```
+
+#### Writing actor
+When we have all necessary exceptions and wrappers, we can start writing our actor. It must contain 4 handlers and constructor. Handlers must be `public void` and throw exception designated for them.
+
+As you can see, since `get` and `remove` handlers are basically the same, if they cannot find item in our storage, they'll throw an exception `ItemNotFoundException`. It will be useful for us later.
+
+```java
+package com.example.your_project.items_storage.actors;
+
+import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
+import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
+
+import java.util.Map;
+
+public class ItemsStorage {
+
+    private Map<String, String> storage;
+
+    public ItemsStorage(final ItemsStorageConfig config) throws ItemsStorageException {
         try {
-            wrapper.setAllItems(Collections.unmodifiableList(items));
-        } catch (ChangeValueException e) {
-            throw new ItemsActorException("Failed to set list", e);
-        }
-    }
-
-    /**
-     * Adds the new item to the list.
-     * @param wrapper the wrapper where to get the name of the new item
-     * @throws ItemsActorException if something goes wrong
-     */
-    public void addNewItem(final AddNewItemWrapper wrapper) throws ItemsActorException {
-        try {
-            items.add(wrapper.getNewItemName());
+            storage = config.getMap();
         } catch (ReadValueException e) {
-            throw new ItemsActorException("Failed to get item name", e);
+            throw new ItemsStorageException("Unable to get map object from the config", e);
         }
     }
 
+    public void get(final GetItemMessage message) throws GetItemException, ItemNotFoundException {
+        try {
+            String key = message.getKey();
+            String value = storage.get(key);
+            if (value == null) {
+                throw new ItemNotFoundException(String.format("Unable to find value for key %s", key));
+            }
+            message.setValue(value);
+        } catch (ReadValueException e) {
+            throw new GetItemException("Unable to get key from the message", e);
+        } catch (ChangeValueException e) {
+            throw new GetItemException("Unable to set value to the message", e);
+        }
+    }
+
+    public void set(final SetItemMessage message) throws SetItemException {
+        try {
+            String key = message.getKey();
+            String value = message.getValue();
+            storage.put(key, value);
+        } catch (ReadValueException e) {
+            throw new SetItemException("Unable to get data from the message", e);
+        }
+    }
+
+    public void remove(final RemoveItemMessage message) throws RemoveItemException, ItemNotFoundException {
+        try {
+            String key = message.getKey();
+            String value = storage.remove(key);
+            if (value == null) {
+                throw new ItemNotFoundException(String.format("Unable to remove value for key %s", key));
+            }
+            message.setValue(value);
+        } catch (ReadValueException e) {
+            throw new RemoveItemException("Unable to get key from the message", e);
+        } catch (ChangeValueException e) {
+            throw new RemoveItemException("Unable to set removed value to the message", e);
+        }
+    }
+
+    public void clear(final ClearStorageMessage message) throws ClearStorageException {
+        try {
+            storage.clear();
+        } catch (UnsupportedOperationException e) {
+            throw new ClearStorageException("Unable to clear internal storage", e);
+        }
+    }
 }
 ```
 
-#### Test the Actor
+##### Testing actor
 
-Note the Actor is just a Java class which uses some specific interfaces.
+You can see that our ItemsStorage actor mostly using interfaces, allowing us to easily test it.
 It's possible to test it completely independently by mock implementations of the wrappers.
 You can use [Mockito](http://site.mockito.org/) for it.
 
-Modify `ItemsFeature/ItemsActor/src/test/java/info/smart_tools/examples/items/items_feature/items_actor/ItemsActorTest.java`.
+Note that while it is recommended to test it fully (i.e. 100% test coverage), we'll test only one handler. Other handlers may be tested in similar manner.
 
 ```java
-package info.smart_tools.examples.items.items_feature.items_actor;
+package com.example.your_project.items_storage.actors;
 
-import info.smart_tools.examples.items.items_feature.items_actor.exception.ItemsActorException;
-import info.smart_tools.examples.items.items_feature.items_actor.wrapper.AddNewItemWrapper;
-import info.smart_tools.examples.items.items_feature.items_actor.wrapper.GetAllItemsWrapper;
 import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
 import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-public class ItemsActorTest {
+public class TestItemsStorage {
 
-    private ItemsActor actor;
+    private ItemsStorage actor;
+
+    @Mock
+    private Map<String, String> map;
+
+    @Mock
+    private GetItemMessage message;
+
+    @Captor
+    private ArgumentCaptor<String> captor;
 
     @Before
-    public void init() {
-        actor = new ItemsActor();
-    }
-
-    private List getListFromWrapper(final GetAllItemsWrapper mock) throws ChangeValueException {
-        ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-        verify(mock).setAllItems(captor.capture());
-        return captor.getValue();
+    public void init() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        ItemsStorageConfig config = new ItemsStorageConfig() {
+            @Override
+            public Map<String, String> getMap() throws ReadValueException {
+                return map;
+            }
+        };
+        actor = new ItemsStorage(config);
     }
 
     @Test
-    public void testAddOneItem() throws ItemsActorException, ChangeValueException, ReadValueException {
-        GetAllItemsWrapper getAllWrapperBefore = mock(GetAllItemsWrapper.class);
-        actor.getAllItems(getAllWrapperBefore);
-        assertEquals(Collections.emptyList(), getListFromWrapper(getAllWrapperBefore));
+    public void testGetValue() throws Exception {
+        doReturn("value").when(map).get(any());
+        doReturn("key").when(message).getKey();
 
-        AddNewItemWrapper newItemWrapper = mock(AddNewItemWrapper.class);
-        when(newItemWrapper.getNewItemName()).thenReturn("new item");
-        actor.addNewItem(newItemWrapper);
-        verify(newItemWrapper).getNewItemName();
+        actor.get(message);
 
-        GetAllItemsWrapper getAllWrapperAfter = mock(GetAllItemsWrapper.class);
-        actor.getAllItems(getAllWrapperAfter);
-        List<String> expected = new ArrayList<>();
-        expected.add("new item");
-        assertEquals(expected, getListFromWrapper(getAllWrapperAfter));
+        verify(message).getKey();
+        verify(message).setValue(captor.capture());
+        assertEquals("value", captor.getValue());
     }
 
+    @Test(expected = GetItemException.class)
+    public void testGetKeyException() throws Exception {
+        doThrow(new ReadValueException()).when(message).getKey();
+
+        actor.get(message);
+
+        verify(message).getKey();
+    }
+
+    @Test(expected = GetItemException.class)
+    public void testSetValueException() throws Exception {
+        doReturn("value").when(map).get(any());
+        doReturn("key").when(message).getKey();
+        doThrow(new ChangeValueException()).when(message).setValue(anyString());
+
+        actor.get(message);
+
+        verify(message).getKey();
+    }
 }
 ```
 
-Note `das` already added all dependencies necessary for the test.
+#### Writing plugin
 
-### Create the Plugin
+Simply writing actor won't do anything to it. Without plugin, it won't appear in system IOC. To register actor in IOC, we must do it in the correspoding plugin.
 
-A Plugin is necessary to make your actor available in the system IOC. Typically each Actor has a corresponding Plugin.
-
-Create the new Plugin, use `cpl` subcommand. The Plugin name is "ItemsActorPlugin". It's located in the "ItemsFeature".
-
-```console
-$ das cpl -pln ItemsActorPlugin -fn ItemsFeature
-Distributed Actor System. Design, assembly and deploy tools.
-Version 0.6.0.
-Creating plugin ...
-Plugin has been created successful.
-```
-
-The new folder "ItemsActorPlugin" is created under the Feature folder. Check it's content.
-
-```console
-$ ls ItemsFeature
-config.json  ItemsActor  ItemsActorPlugin  ItemsFeatureDistribution  pom.xml
-$ ls ItemsFeature/ItemsActorPlugin
-pom.xml  src
-```
-
-The new Maven module is created for the Plugin. This module is a submodule of the Feature.
-
-#### Write the Plugin code
-
-Modify `ItemsFeature/ItemsActorPlugin/src/main/java/info/smart_tools/examples/items/items_feature/items_actor_plugin/ItemsActorPlugin.java`. You should add a code to register a strategy of retrieving of your Actor instance from IOC. In this simplest case the strategy just creates a new instance when IOC is queried for the Actor. You must define the name of the Actor, how it's visible in IOC, "ItemsActor" in this case.
+Since plugin is an integral part of SmartActors framework, it must extend `BoostrapPlugin` class and have two methods annotated with `@Item` and `@ItemRevert` respectively. The first method will register actor in the IOC, while the second one will remove actor from IOC if necessary.
 
 ```java
-package info.smart_tools.examples.items.items_feature.items_actor_plugin;
+package com.example.your_project.items_storage.plugins;
 
-import info.smart_tools.examples.items.items_feature.items_actor.ItemsActor;
+import com.example.your_project.items_storage.actors.ItemsStorage;
+import com.example.your_project.items_storage.actors.ItemsStorageConfig;
+import com.example.your_project.items_storage.actors.ItemsStorageException;
 import info.smart_tools.smartactors.base.exception.invalid_argument_exception.InvalidArgumentException;
 import info.smart_tools.smartactors.base.interfaces.iaction.exception.FunctionExecutionException;
 import info.smart_tools.smartactors.base.strategy.apply_function_to_arguments.ApplyFunctionToArgumentsStrategy;
 import info.smart_tools.smartactors.feature_loading_system.bootstrap_plugin.BootstrapPlugin;
 import info.smart_tools.smartactors.feature_loading_system.interfaces.ibootstrap.IBootstrap;
+import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
 import info.smart_tools.smartactors.ioc.iioccontainer.exception.RegistrationException;
 import info.smart_tools.smartactors.ioc.iioccontainer.exception.ResolutionException;
-import info.smart_tools.smartactors.ioc.ioc.IOC;
+import info.smart_tools.smartactors.ioc.iioccontainer.exception.DeletionException;
 import info.smart_tools.smartactors.ioc.key_tools.Keys;
+import info.smart_tools.smartactors.ioc.ioc.IOC;
 
-public class ItemsActorPlugin extends BootstrapPlugin {
+import java.util.HashMap;
+import java.util.Map;
 
-     /**
-     * Constructs the plugin.
-     * @param bootstrap the bootstrap instance
-     */
-    public ItemsActorPlugin(final IBootstrap bootstrap) {
-            super(bootstrap);
+public class ItemsStoragePlugin extends BootstrapPlugin {
+
+    public ItemsStoragePlugin(final IBootstrap bootstrap) {
+        super(bootstrap);
     }
 
-    @Item("items-actor-plugin")     // the unique name of the plugin item, the items may depend on each other
+    @Item("items-storage-plugin")
     public void init()
             throws ResolutionException, RegistrationException, InvalidArgumentException {
-        IOC.register(
-                Keys.getKeyByName("ItemsActor"),    // the unique name of the actor in IOC
-                new ApplyFunctionToArgumentsStrategy(
-                        a -> {
-                            try {
-                                return new ItemsActor();
-                            } catch (Exception e) {
-                                throw new FunctionExecutionException(e);
+        IOC.register(Keys.getKeyByName("items storage"), new ApplyFunctionToArgumentsStrategy(
+                args -> {
+                    try {
+                        ItemsStorageConfig config = new ItemsStorageConfig() {
+                            @Override
+                            public Map<String, String> getMap() throws ReadValueException {
+                                return new HashMap<>();
                             }
-                        }
-                )
-        );
+                        };
+
+                        return new ItemsStorage(config);
+                    } catch (ItemsStorageException e) {
+                        throw new FunctionExecutionException("Unable to register 'items storage' actor");
+                    }
+                }
+        ));
+    }
+
+    @ItemRevert("items-storage-plugin")
+    public void unregister() throws ResolutionException, DeletionException {
+        IOC.unregister(Keys.getKeyByName("items storage"));
     }
 }
 ```
 
-The Plugin Maven module depends on the Actor Maven module. So, add the dependency to `ItemsFeature/ItemsActorPlugin/pom.xml`.
+##### Testing plugin
+Though it might look that plugin does not require any testing, because it's doing only one job - registering and unregistering actor in the IOC, it should be tested too. And because it's working with SmartActors infrastructure, plugin testing is a little bit different from usual actor testing.
 
-```xml
-        <dependency>
-            <groupId>info.smart_tools.examples.items</groupId>
-            <artifactId>items-feature.items-actor</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
-        </dependency>
+The most important thing in plugin testing is that there should be IOC mock provided by `IOCInitializer` abstract class. It'll allow us to register actor and attempt to resolve it.
+
+```java
+package com.example.your_project.items_storage.plugins;
+
+import com.example.your_project.items_storage.actors.ItemsStorage;
+import info.smart_tools.smartactors.helpers.IOCInitializer.IOCInitializer;
+import info.smart_tools.smartactors.ioc.iioccontainer.exception.ResolutionException;
+import info.smart_tools.smartactors.ioc.ioc.IOC;
+import info.smart_tools.smartactors.ioc.key_tools.Keys;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
+public class TestItemsStoragePlugin extends IOCInitializer {
+
+    @Override
+    protected void registry(String... strings) throws Exception {
+        registryStrategies("ifieldname strategy", "iobject strategy");
+    }
+
+    @Test
+    public void testRegisterSuccessful() throws Exception {
+        ItemsStoragePlugin plugin = new ItemsStoragePlugin(null);
+        plugin.init();
+        Object object = IOC.resolve(Keys.getKeyByName("items storage"));
+        assertTrue(object instanceof ItemsStorage);
+    }
+
+    @Test(expected = ResolutionException.class)
+    public void testRegisterUnsuccessful() throws Exception {
+        IOC.resolve(Keys.getKeyByName("items storage"));
+    }
+
+    @Test(expected = ResolutionException.class)
+    public void testUnregisterSuccess() throws Exception {
+        ItemsStoragePlugin plugin = new ItemsStoragePlugin(null);
+        plugin.init();
+        Object object = IOC.resolve(Keys.getKeyByName("items storage"));
+        assertTrue(object instanceof ItemsStorage);
+        plugin.unregister();
+        IOC.resolve(Keys.getKeyByName("items storage"));
+    }
+}
 ```
 
-### Define the message Map
+### Configuring features
 
-How it's time to create the Config for the Feature. You should define the Actor, how to get it from IOC, and the message Map, the chain of actors to process the message.
+After writing actor, plugin and tests for them, we can finally work on configuring feature. Declare our actor in `objects` section of the feature like in the example below.
 
-We define two Maps: one to get all items, another to add a new item. Our ItemsActor appears in both Maps, but the different handlers are used.
-
-Modify the config of the Feature: `ItemsFeature/config.json`.
+Note that we're using `"kind": "actor"`, because we're dealing with stateful actor and we need to build up a queue for handlers to process correctly. If actor does not require any queue for handlers, then `"stateless_actor"` can be used.
 
 ```json
 {
-  "featureName": "info.smart_tools.examples.items:items-feature",
+  "featureName": "com.example.your-project:items-storage",
   "afterFeatures": [],
   "objects": [
     {
-      "name": "items-actor",
+      "name": "items-storage",
       "kind": "actor",
-      "dependency": "ItemsActor"
-    }
-  ],
-  "maps": [
-    {
-      "id": "get-all-items",
-      "externalAccess": true,
-      "steps": [
-        {
-          "target": "items-actor",
-          "handler": "getAllItems",
-          "wrapper": {
-            "out_setAllItems": "response/items"
-          }
-        },
-        {
-          "target": "sendResponse"
-        }
-      ],
-      "exceptional": [
-      ]
-    },
-    {
-      "id": "add-new-item",
-      "externalAccess": true,
-      "steps": [
-        {
-          "target": "items-actor",
-          "handler": "addNewItem",
-          "wrapper": {
-            "in_getNewItemName": "message/name"
-          }
-        },
-        {
-          "target": "sendResponse"
-        }
-      ],
-      "exceptional": [
-      ]
+      "dependency": "items storage"
     }
   ]
 }
 ```
 
-Because the Maps will serve external HTTP requests we explicitly allow external access to them with "externalAccess" property.
+After that, we can start our project by executing these commands:
+- `make download_core` - download core feature necessary for the server to work, it should be done once. Please note that you should have `core-pack.json` present in your project for core features to download
+- `make install_features` - build our features and put them in the server directory
+- `make start_server` - start SmartActors server
 
-For each Actor in the Map it's necessary to define mapping of the message fields to the Wrapper methods. Note, "out" parameters correspond to setters in the Wrapper and transfers data _out from_ the Actor, while "in" parameters correspond to getters in the Wrapper and transfers data _into_ the Actor.
-
-The "response/" prefix of the mapping values means we work with the response object, it'll pass back to the HTTP client at the end of the Map.
-
-The "message/" prefix of the mapping values means we work with the fields of the Message passing between the Actors, here the HTTP request comes in.
-
-Because our server will serve HTTP requests and it should return some responses, we add to the end of each Map the system message receiver named "sendResponse".
-
-The "exceptional" property for each Map defines how to process exceptions during the processing. Here it's empty array.
-
-### Build the Feature
-
-Use `make` subcommand to build all the Features in the Project.
+After you've executed these three commands, you'll see following in your terminal:
 
 ```console
-$ das make
-make project
-[INFO] Scanning for projects...
+...skipping core features loading...
 
-... many output from Maven ...
+[INFO] Start unzipping/copying feature '*unknown*:items-storage:0.1.0'.
+[OK] -------------- Feature 'com.example.your-project:items-storage:0.1.0' unzipped/copied successfully.
+[INFO] Start loading feature 'com.example.your-project:items-storage:0.1.0'.
+[OK] Initial load of plugin "items-storage-plugin" done.
+[OK] -------------- Feature 'com.example.your-project:items-storage:0.1.0' loaded successfully.
 
-[INFO] --- maven-assembly-plugin:3.0.0:single (default) @ items-feature-distribution ---
-[INFO] Reading assembly descriptor: bin.xml
-[INFO] Building zip: /home/gelin/work/7bits/smart-tools/tutorials/src/how_to_start/Items/project-distribution/items-feature-0.1.0-SNAPSHOT-archive.zip
-[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO]
-[INFO] items .............................................. SUCCESS [  0.570 s]
-[INFO] items-feature ...................................... SUCCESS [  0.016 s]
-[INFO] items-feature.items-actor .......................... SUCCESS [  3.652 s]
-[INFO] items-feature.items-actor-plugin ................... SUCCESS [  0.874 s]
-[INFO] items-feature-distribution ......................... SUCCESS [  0.802 s]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 6.149 s
-[INFO] Finished at: 2017-06-30T13:03:43+06:00
-[INFO] Final Memory: 22M/286M
-[INFO] ------------------------------------------------------------------------
+
+
+[INFO] Feature group has been loaded: [
+com.example.your-project:items-storage:0.1.0 - (OK)]
+[INFO] elapsed time - 00:00:00.212.
+
 ```
 
-The result is zip archives of the Features in "project-distribution" folder.
+If you see this, then your feature has been successfully loaded. However, there's one problem - we can't access it. Why we were writing so many handlers for the stateful actor, if we can't simply access it when the server started?
 
-```console
-$ ls project-distribution
-items-feature-0.1.0-SNAPSHOT-archive.zip
-```
+And here comes another part in feature development - we need to write additional features to access our newly written actor. We need to write 4 features:
+* `get-item`
+* `set-item`
+* `remove-item`
+* `clear-storage`
 
-## Configure Endpoint
+And on top of that, we need two additional features:
+- `endpoint-configuration` - this feature is necessary for our application to be able to receive requests and send responses. We'll write it in the first place.
+- `status-code-setter` - this feature contains the actor which sets provided status code to the response body. We'll use it to handle `ItemNotFoundException`.
 
-You have to provide some configuration for the HTTP endpoint of the Server.
-
-Create the new Feature named "EndpointConfiguration".
-
-```console
-$ das cf -fn EndpointConfiguration
-Distributed Actor System. Design, assembly and deploy tools.
-Version 0.6.0.
-Creating feature ...
-Feature has been created successful.
-```
-
-This Feature contains only config file. Modify `EndpointConfiguration/config.json`.
+#### endpoint-configuration
+Run `make cf artId="endpoint-configuration" artPack="endpoint_configuration"` and remove `src` folder from generated feature, we won't need it in this feature. Modify it's `config.json` as in the code example below.
 
 ```json
 {
-  "featureName": "info.smart_tools.examples.items:endpoint-configuration",
-  "afterFeatures": [],
+  "featureName": "com.example.your-project:endpoint-configuration",
+  "afterFeatures": [
+    "info.smart_tools.smartactors:http-endpoint-plugins",
+    "info.smart_tools.smartactors:message-bus-plugins"
+  ],
   "objects": [
     {
       "name": "router",
@@ -596,21 +589,21 @@ This Feature contains only config file. Modify `EndpointConfiguration/config.jso
       "strategyDependency": "chain choice strategy"
     },
     {
-      "name": "sendResponse",
+      "name": "response-sender",
       "kind": "raw",
       "dependency": "response sender receiver"
     }
   ],
   "maps": [
     {
-      "id": "routing_chain",
+      "id": "routing-chain",
+      "externalAccess": false,
       "steps": [
         {
           "target": "router"
         }
       ],
-      "exceptional": [
-      ]
+      "exceptional": []
     }
   ],
   "endpoints": [
@@ -618,304 +611,469 @@ This Feature contains only config file. Modify `EndpointConfiguration/config.jso
       "name": "mainHttpEp",
       "type": "http",
       "port": 9909,
-      "startChain": "routing_chain",
-      "maxContentLength": 4098,
+      "startChain": "routing-chain",
+      "maxContentLength": 4096,
       "stackDepth": 5
     }
   ]
 }
 ```
 
-You should add some message receivers. "router" is to forward the incoming requests to specified message maps. "sendResponse" is to transfer the message back to the HTTP client.
+Here's what we're doing in this feature:
+- We're declaring that our feature `endpoint-configuraion` will load after features `http-endpoint-plugins` and `message-bus-plugins`
+- Endpoint can be acessed at port 9909
+- Chain `routing-chain` is used to route between different chains available in the project
+- We're limiting the size of the request, it should be no more than 4096 bytes
+- We're only able to go down as deep as 5 chains using various routing mechanisms
 
-You should define the initial "routing_chain" where the HTTP requests start processing.
+Take a closer look at `externalAccess` field in chain configuration. This field declares if chain can be accessed from HTTP endpoint or not. We'll use it in features that access our actor.
 
-You should define the "endpoints" section with the TCP port the server will listen on and some other parameters.
-
-Build all Features with `das`.
-
-```console
-$ das make
-make project
-
-... many output from Maven ...
-
-[INFO] Reactor Summary:
-[INFO]
-[INFO] items .............................................. SUCCESS [  0.503 s]
-[INFO] items-feature ...................................... SUCCESS [  0.015 s]
-[INFO] items-feature.items-actor .......................... SUCCESS [  3.506 s]
-[INFO] items-feature.items-actor-plugin ................... SUCCESS [  0.920 s]
-[INFO] items-feature-distribution ......................... SUCCESS [  1.010 s]
-[INFO] endpoint-configuration ............................. SUCCESS [  0.008 s]
-[INFO] endpoint-configuration-distribution ................ SUCCESS [  0.085 s]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 6.304 s
-[INFO] Finished at: 2017-06-30T17:17:18+06:00
-[INFO] Final Memory: 24M/322M
-[INFO] ------------------------------------------------------------------------
-```
-
-## Run the Server
-
-It's time to deploy our Features to the Server.
-
-### Create the Server folder
-
-Go back to the initial folder outside of the Project hierarchy.
-
-Create here the folder of the Server. Use `cs` subcommand. The Server name is "ItemsServer".
-
-```console
-$ das cs -sn ItemsServer
-Distributed Actor System. Design, assembly and deploy tools.
-Version 0.6.0.
-Creating server ...
-... some warnings skipped ...
-Server has been created successful.
-```
-
-The new folder "ItemsServer" is created. Check it's content.
-
-```console
-$ ls
-Items  ItemsServer
-$ ls ItemsServer
-configuration.json  core  corefeatures  features  server.jar
-```
-
-The `server.jar` is the main entry point for the Server.
-
-The `configuration.json` is the main configuration file of the Server.
-
-### Download core
-
-Use subcommand `dc` to download core jars for the Server. Point the path to the Server folder.
-
-```console
-$ das dc -path ItemsServer
-Distributed Actor System. Design, assembly and deploy tools.
-Version 0.6.0.
-Download server core ...
-... some warnings skipped ...
-Server core has been downloaded successful.
-```
-
-Now the Server's "core" folder contains downloaded core libraries.
-
-```console
-$ ls ItemsServer/core
-base-0.6.0                           feature-management-0.6.0         iobject-plugins-0.6.0            message-processing-interfaces-0.6.0       task-plugins.non-blocking-queue-0.6.0
-configuration-manager-0.6.0          field-0.6.0                      ioc-0.6.0                        message-processing-plugins-0.6.0          utility-tools-0.6.0
-configuration-manager-plugins-0.6.0  field-plugins-0.6.0              ioc-plugins-0.6.0                on-feature-loading-service-starter-0.6.0
-core-service-starter-0.6.0           iobject-0.6.0                    ioc-strategy-pack-0.6.0          scope-0.6.0
-dumpable-interface-0.6.0             iobject-extension-0.6.0          ioc-strategy-pack-plugins-0.6.0  scope-plugins-0.6.0
-feature-loading-system-0.6.0         iobject-extension-plugins-0.6.0  message-processing-0.6.0         task-0.6.0
-```
-
-### Add core Features
-
-We want our server to receive HTTP requests and reply with a response. So we need to add "http-endpoint" core Feature and it's dependencies.
-
-Where to download the core Features and ids of their artifacts must be listed in `ItemsServer/corefeatures/features.json` file. Create this file.
+#### status-code-setter
+This feature contains one stateless actor - `StatusCodeSetter`. What it does is it sets HTTP status code to the response body. Since it doesn't depend on any other feature, there'll be no dependencies for it. Rather, features that need to set status code in response body will depend on it.
 
 ```json
 {
-  "repositories": [
+  "featureName": "com.example.your-project:status-code-setter",
+  "afterFeatures": []
+}
+```
+
+##### Actor and wrapper
+Since the actor is pretty simple, it will contain only one handler and only one wrapper. This wrapper will contain one getter and one setter.
+
+To avoid having large quick start tutorial, tests and JavaDocs for this actor and plugin are skipped, but they should be present in your project. Don't even think about pushing code without tests and JavaDocs to your repository :)
+
+**Source code** - `SetStatusCodeException.java`
+```java
+public class SetStatusCodeException extends Exception {
+    public SetStatusCodeException(final String message) {
+        super(message);
+    }
+
+    public SetStatusCodeException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+}
+```
+
+**Source code** - `SetStatusCodeMessage.java`
+```java
+package com.example.your_project.status_code_setter.actors;
+
+import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
+import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
+
+public interface SetStatusCodeMessage {
+    Integer getStatusCode() throws ReadValueException;
+
+    void setStatusCode(Integer statusCode) throws ChangeValueException;
+}
+```
+
+**Source code** - `StatusCodeSetter.java`
+```java
+package com.example.your_project.status_code_setter.actors;
+
+import info.smart_tools.smartactors.iobject.iobject.exception.ChangeValueException;
+import info.smart_tools.smartactors.iobject.iobject.exception.ReadValueException;
+
+public class StatusCodeSetter {
+
+    public void set(final SetStatusCodeMessage message) throws SetStatusCodeException {
+        try {
+            Integer statusCode = message.getStatusCode();
+            message.setStatusCode(statusCode);
+        } catch (ReadValueException e) {
+            throw new SetStatusCodeException("Unable to get status code from the message", e);
+        } catch (ChangeValueException e) {
+            throw new SetStatusCodeException("Unable to set status code to the message", e);
+        } catch (NumberFormatException e) {
+            throw new SetStatusCodeException("Unable to parse provided status code", e);
+        }
+    }
+}
+```
+
+##### Plugin
+**Source code** - `StatusCodeSetterPlugin.java`
+```java
+package com.example.your_project.status_code_setter.plugins;
+
+import info.smart_tools.smartactors.base.exception.invalid_argument_exception.InvalidArgumentException;
+import info.smart_tools.smartactors.base.strategy.apply_function_to_arguments.ApplyFunctionToArgumentsStrategy;
+import info.smart_tools.smartactors.feature_loading_system.bootstrap_plugin.BootstrapPlugin;
+import info.smart_tools.smartactors.feature_loading_system.interfaces.ibootstrap.IBootstrap;
+import info.smart_tools.smartactors.ioc.iioccontainer.exception.RegistrationException;
+import info.smart_tools.smartactors.ioc.iioccontainer.exception.ResolutionException;
+import info.smart_tools.smartactors.ioc.iioccontainer.exception.DeletionException;
+import info.smart_tools.smartactors.ioc.key_tools.Keys;
+import info.smart_tools.smartactors.ioc.ioc.IOC;
+import com.example.your_project.status_code_setter.actors.StatusCodeSetter;
+
+public class StatusCodeSetterPlugin extends BootstrapPlugin {
+
+    public StatusCodeSetterPlugin(final IBootstrap bootstrap) {
+        super(bootstrap);
+    }
+
+    @Item("status-code-setter-plugin")
+    public void init()
+            throws ResolutionException, RegistrationException, InvalidArgumentException {
+        IOC.register(Keys.getKeyByName("status code setter"), new ApplyFunctionToArgumentsStrategy(
+                args -> new StatusCodeSetter()
+        ));
+    }
+
+    @ItemRevert("status-code-setter-plugin")
+    public void unregister() throws ResolutionException, DeletionException {
+        IOC.unregister(Keys.getKeyByName("status code setter"));
+    }
+}
+```
+
+#### get-item feature
+To access `get` handler in our actor, we need to write chain that gives us the ability to get item from the `items-storage` actor and send it back to the user. And we know that `get` handler may throw `ItemNotFoundException`. We'll handle it with our `StatusCodeSetter` actor using `exceptional` section in chain configuration.
+
+```json
+{
+  "featureName": "com.example.your-project:get-item",
+  "afterFeatures": [
+    "com.example.your-project:endpoint-configuration",
+    "com.example.your-project:items-storage",
+    "com.example.your-project:status-code-setter"
+  ],
+  "objects": [
     {
-      "repositoryId": "smartactors_core_and_core_features",
-      "type": "default",
-      "url": "https://repository.smart-tools.info/artifactory/smartactors_core_and_core_features/"
+      "name": "item-to-get-not-found-set-status-code",
+      "kind": "stateless_actor",
+      "dependency": "status code setter"
     }
   ],
-  "features": [
+  "maps": [
     {
-      "group": "info.smart_tools.smartactors",
-      "name": "http-endpoint",
-      "version": "0.6.0"
+      "id": "get-item/item-not-found",
+      "externalAccess": false,
+      "steps": [
+        {
+          "target": "item-to-get-not-found-set-status-code",
+          "handler": "set",
+          "wrapper": {
+            "in_getStatusCode": "const/404",
+            "out_setStatusCode": "context/httpResponseStatusCode"
+          }
+        },
+        {
+          "target": "response-sender"
+        }
+      ],
+      "exceptional": []
     },
     {
-      "group": "info.smart_tools.smartactors",
-      "name": "http-endpoint-plugins",
-      "version": "0.6.0"
-    },
-    {
-      "group": "info.smart_tools.smartactors",
-      "name": "endpoint",
-      "version": "0.6.0"
-    },
-    {
-      "group": "info.smart_tools.smartactors",
-      "name": "endpoint-plugins",
-      "version": "0.6.0"
-    },
-    {
-      "group": "info.smart_tools.smartactors",
-      "name": "endpoint-service-starter",
-      "version": "0.6.0"
-    },
-    {
-      "group": "info.smart_tools.smartactors",
-      "name": "message-bus",
-      "version": "0.6.0"
-    },
-    {
-      "group": "info.smart_tools.smartactors",
-      "name": "message-bus-service-starter",
-      "version": "0.6.0"
-    },
-    {
-      "group": "info.smart_tools.smartactors",
-      "name": "timer",
-      "version": "0.6.0"
-    },
-    {
-      "group": "info.smart_tools.smartactors",
-      "name": "timer-plugins",
-      "version": "0.6.0"
+      "id": "get-item",
+      "externalAccess": true,
+      "steps": [
+        {
+          "target": "items-storage",
+          "handler": "get",
+          "wrapper": {
+            "in_getKey": "message/key",
+            "out_setValue": "response/value"
+          }
+        },
+        {
+          "target": "response-sender"
+        }
+      ],
+      "exceptional": [
+        {
+          "class": "com.example.your_project.items_storage.actors.ItemNotFoundException",
+          "chain": "get-item/item-not-found",
+          "after": "break"
+        }
+      ]
     }
   ]
 }
 ```
 
-The server will download all listed Features during it's start.
+Before we'll do other chains, we need to discuss how actors are working in chains. In traditional actor model, actors take what they need from the message, perform some action upon data and outputs it back it to the message. When they output modified data back to the message, actor can also tell where this message should go next - either to other actors, or go back to itself and perform action upon data once more.
 
-Currently the server cannot download dependencies of the Features. So you have to list in `features.json` not only "http-endpoint", but also it's dependencies: "endpoint", "message-bus" and "timer", and some additional Features with the names ending with "-plugins" and "-service-starter".
+In SmartActors this process is more linear - we still have message, actors, but they're placed in a specific order of execution by the message map (see [Routing Slip](https://www.enterpriseintegrationpatterns.com/patterns/messaging/RoutingTable.html) pattern). So in this case `items-storage` actor will be called first, then `response-sender`.
 
-### Add custom Features
+To access message fields, `message/` prefix is used. It is where user request is stored, actors usually work with it. Prefix `response/` is basically the same as the message, but it will be sent to the user after this chain is completed.
 
-Copy the zip archives of the Features you built to the "features" folder of the Server.
+#### set-item feature
+To set new item or update existing one we'll create feature `set-item`, which will use `set` handler.
 
-```console
-$ cp Items/project-distribution/*.zip ItemsServer/features
-$ ls ItemsServer/features
-endpoint-configuration-0.1.0-SNAPSHOT-archive.zip  items-feature-0.1.0-SNAPSHOT-archive.zip
+```json
+{
+  "featureName": "com.example.your-project:set-item",
+  "afterFeatures": [
+    "com.example.your-project:endpoint-configuration",
+    "com.example.your-project:items-storage"
+  ],
+  "maps": [
+    {
+      "id": "set-item",
+      "externalAccess": true,
+      "steps": [
+        {
+          "target": "items-storage",
+          "handler": "set",
+          "wrapper": {
+            "in_getKey": "message/key",
+            "in_getValue": "message/value"
+          }
+        },
+        {
+          "target": "response-sender"
+        }
+      ],
+      "exceptional": []
+    }
+  ]
+}
 ```
 
-### Run the Server
+Note that while we don't set anything to the `response` object, we still need to send some kind of the response to the user, otherwise he'll receive `500 Internal Server Error`.
 
-Go to the Server's folder and start it from the command line.
+#### remove-item feature
+To remove any existing item from the storage, we'll create `remove-item` feature. Just like `get` handler, `remove` handler too may throw `ItemNotFoundException`, so we'll handle it accordingly.
+
+```json
+{
+  "featureName": "com.example.your-project:remove-item",
+  "afterFeatures": [
+    "com.example.your-project:endpoint-configuration",
+    "com.example.your-project:items-storage",
+    "com.example.your-project:status-code-setter"
+  ],
+  "objects": [
+    {
+      "name": "item-to-remove-not-found-set-status-code",
+      "kind": "stateless_actor",
+      "dependency": "status code setter"
+    }
+  ],
+  "maps": [
+    {
+      "id": "remove-item/item-not-found",
+      "externalAccess": false,
+      "steps": [
+        {
+          "target": "item-to-remove-not-found-set-status-code",
+          "handler": "set",
+          "wrapper": {
+            "in_getStatusCode": "const/404",
+            "out_setStatusCode": "context/httpResponseStatusCode"
+          }
+        },
+        {
+          "target": "response-sender"
+        }
+      ],
+      "exceptional": []
+    },
+    {
+      "id": "remove-item",
+      "externalAccess": true,
+      "steps": [
+        {
+          "target": "items-storage",
+          "handler": "remove",
+          "wrapper": {
+            "in_getKey": "message/key",
+            "out_setValue": "response/value"
+          }
+        },
+        {
+          "target": "response-sender"
+        }
+      ],
+      "exceptional": [
+        {
+          "class": "com.example.your_project.items_storage.actors.ItemNotFoundException",
+          "chain": "remove-item/item-not-found",
+          "after": "break"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### clear-storage feature
+To remove all existing items in storage, we'll create `clear-storage` feature.
+
+```json
+{
+  "featureName": "com.example.your-project:clear-storage",
+  "afterFeatures": [
+    "com.example.your-project:endpoint-configuration",
+    "com.example.your-project:items-storage"
+  ],
+  "maps": [
+    {
+      "id": "clear-storage",
+      "externalAccess": true,
+      "steps": [
+        {
+          "target": "items-storage",
+          "handler": "clear",
+          "wrapper": {}
+        },
+        {
+          "target": "response-sender"
+        }
+      ],
+      "exceptional": []
+    }
+  ]
+}
+```
+
+Note that because wrapper for `clear` handler does not have any field, we leave `wrapper` object empty. But it should be present, otherwise chain will not load properly.
+
+## Running the server
+
+After you've created remaining features, build the project using `make install_features` and start it with `make start_server`. If everything goes well, you'll see this:
 
 ```console
-$ cd ItemsServer
-$ java -jar server.jar
-
-... skipped some warnings and stacktraces ...
-
-[OK] Stage 1: server core has been loaded successful.
-
-
-[INFO] Start downloading feature - 'message-bus'.
-[INFO] Start downloading feature - 'http-endpoint-plugins'.
-[INFO] Start downloading feature - 'endpoint'.
-[INFO] Start downloading feature - 'timer'.
-[OK] -------------- Feature 'timer' has been downloaded successful.
-[INFO] Start downloading feature - 'timer-plugins'.
-[OK] -------------- Feature 'http-endpoint-plugins' has been downloaded successful.
-[INFO] Start downloading feature - 'http-endpoint'.
-[OK] -------------- Feature 'message-bus' has been downloaded successful.
-[INFO] Start downloading feature - 'message-bus-service-starter'.
-[OK] -------------- Feature 'timer-plugins' has been downloaded successful.
-[INFO] Start downloading feature - 'endpoint-service-starter'.
-[OK] -------------- Feature 'message-bus-service-starter' has been downloaded successful.
-[INFO] Start downloading feature - 'endpoint-plugins'.
-[OK] -------------- Feature 'endpoint-service-starter' has been downloaded successful.
-[INFO] Start unzipping feature - 'timer'.
-[OK] -------------- Feature 'endpoint-plugins' has been downloaded successful.
-[INFO] Start unzipping feature - 'http-endpoint-plugins'.
-[OK] -------------- Feature 'http-endpoint-plugins' has been unzipped successful.
-[INFO] Start unzipping feature - 'message-bus'.
-[OK] -------------- Feature 'timer' has been unzipped successful.
-[INFO] Start unzipping feature - 'timer-plugins'.
-[OK] -------------- Feature 'message-bus' has been unzipped successful.
-[INFO] Start unzipping feature - 'message-bus-service-starter'.
-[OK] -------------- Feature 'message-bus-service-starter' has been unzipped successful.
-[OK] -------------- Feature 'timer-plugins' has been unzipped successful.
-[INFO] Start unzipping feature - 'endpoint-service-starter'.
-[INFO] Start unzipping feature - 'endpoint-plugins'.
-[OK] -------------- Feature 'endpoint-service-starter' has been unzipped successful.
-[INFO] Start loading feature - 'timer'.
-[OK] -------------- Feature 'endpoint-plugins' has been unzipped successful.
-[INFO] Start loading feature - 'message-bus-service-starter'.
-[OK] -------------- Feature - 'info.smart_tools.smartactors:message-bus-service-starter' has been loaded successful.
-[INFO] Start loading feature - 'endpoint-service-starter'.
-[OK] -------------- Feature - 'info.smart_tools.smartactors:timer' has been loaded successful.
-[INFO] Start loading feature - 'message-bus'.
-[OK] -------------- Feature - 'info.smart_tools.smartactors:endpoint-service-starter' has been loaded successful.
-[INFO] Start loading feature - 'timer-plugins'.
-[OK] -------------- Feature - 'info.smart_tools.smartactors:message-bus' has been loaded successful.
-[OK] -------------- Feature - 'info.smart_tools.smartactors:timer-plugins' has been loaded successful.
-[OK] -------------- Feature 'endpoint' has been downloaded successful.
-[INFO] Start unzipping feature - 'endpoint'.
-[OK] -------------- Feature 'endpoint' has been unzipped successful.
-[INFO] Start loading feature - 'endpoint'.
-[OK] -------------- Feature 'http-endpoint' has been downloaded successful.
-[INFO] Start unzipping feature - 'http-endpoint'.
-[OK] -------------- Feature 'http-endpoint' has been unzipped successful.
-[OK] -------------- Feature - 'info.smart_tools.smartactors:endpoint' has been loaded successful.
-[INFO] Start loading feature - 'endpoint-plugins'.
-[INFO] Start loading feature - 'http-endpoint'.
-[OK] -------------- Feature - 'info.smart_tools.smartactors:endpoint-plugins' has been loaded successful.
-[OK] -------------- Feature - 'info.smart_tools.smartactors:http-endpoint' has been loaded successful.
-[INFO] Start loading feature - 'http-endpoint-plugins'.
-[OK] -------------- Feature - 'info.smart_tools.smartactors:http-endpoint-plugins' has been loaded successful.
-
 
 [INFO] Feature group has been loaded: [
-info.smart_tools.smartactors:message-bus - (OK),
-info.smart_tools.smartactors:http-endpoint-plugins - (OK),
-info.smart_tools.smartactors:endpoint - (OK),
-info.smart_tools.smartactors:timer - (OK),
-info.smart_tools.smartactors:timer-plugins - (OK),
-info.smart_tools.smartactors:http-endpoint - (OK),
-info.smart_tools.smartactors:message-bus-service-starter - (OK),
-info.smart_tools.smartactors:endpoint-service-starter - (OK),
-info.smart_tools.smartactors:endpoint-plugins - (OK)]
+com.example.your-project:get-item:0.1.0 - (OK), 
+com.example.your-project:clear-storage:0.1.0 - (OK), 
+com.example.your-project:endpoint-configuration:0.1.0 - (OK), 
+com.example.your-project:set-item:0.1.0 - (OK), 
+com.example.your-project:items-storage:0.1.0 - (OK), 
+com.example.your-project:remove-item:0.1.0 - (OK)]
+[INFO] elapsed time - 00:00:00.244.
 
-
-[INFO] Start unzipping feature - 'endpoint-configuration'.
-[INFO] Start unzipping feature - 'items-feature'.
-[OK] -------------- Feature 'endpoint-configuration' has been unzipped successful.
-[INFO] Start loading feature - 'endpoint-configuration'.
-[OK] -------------- Feature 'items-feature' has been unzipped successful.
-[INFO] Start loading feature - 'items-feature'.
-[OK] -------------- Feature - 'info.smart_tools.examples.items:endpoint-configuration' has been loaded successful.
-[OK] -------------- Feature - 'info.smart_tools.examples.items:items-feature' has been loaded successful.
-
-
-[INFO] Feature group has been loaded: [
-info.smart_tools.examples.items:endpoint-configuration - (OK),
-info.smart_tools.examples.items:items-feature - (OK)]
 ```
 
-### Test the Server
+Then you can test your application by sending POST requests with JSON body to `localhost:9909`, since we've configured endpoint to receive requests on port 9909.
 
-Our server listens on port 9909 and receives POST requests. You must provide "messageMapId" in each request.
+**Getting non-existing item**
 
-```console
-$ curl -X POST http://localhost:9909/ \
-  -H 'content-type: application/json' \
-  -d '{
-    "messageMapId": "get-all-items"
+```bash
+$ curl --request POST \
+    --verbose \
+    --url http://localhost:9909/ \
+    --header 'content-type: application/json' \
+    --data '{
+  "messageMapId": "get-item",
+  "key": "obj"
   }'
-{"items":[]}
 
-$ curl -X POST http://localhost:9909/ \
-  -H 'content-type: application/json' \
-  -d '{
-    "messageMapId": "add-new-item",
-    "name": "new item"
-}'
-{}
-
-$ curl -X POST http://localhost:9909/ \
-  -H 'content-type: application/json' \
-  -d '{
-    "messageMapId": "get-all-items"
-  }'
-{"items":["new item"]}
+$ *   Trying ::1:9909...
+  * TCP_NODELAY set
+  * Connected to localhost (::1) port 9909 (#0)
+  > POST / HTTP/1.1
+  > Host: localhost:9909
+  > User-Agent: curl/7.68.0
+  > Accept: */*
+  > content-type: application/json
+  > Content-Length: 50
+  > 
+  * upload completely sent off: 50 out of 50 bytes
+  * Mark bundle as not supporting multiuse
+  < HTTP/1.1 404 Not Found
+  < Content-Type: application/json
+  < Content-Length: 2
+  < Connection: keep-alive
+  < 
+  * Connection #0 to host localhost left intact
+$ {}
 ```
 
-You see the server accepts a POSTed JSON document as an incoming message. This message is passed to the Map defined in "messageMapId" property. The response, created in the Map is returned as a JSON body.
+**Adding new item and then getting it**
+
+```bash
+$ curl --request POST \
+    --url http://localhost:9909/ \
+    --header 'content-type: application/json' \
+    --data '{
+  "messageMapId": "set-item",
+  "key": "obj",
+  "value": "example value"
+  }'
+$ {}
+```
+
+```bash
+$ curl --request POST \
+    --url http://localhost:9909/ \
+    --header 'content-type: application/json' \
+    --data '{
+  "messageMapId": "get-item",
+  "key": "obj"
+  }'
+$ {"value":"example value"}
+```
+
+**Removing created value**
+
+```bash
+$ curl --request POST \
+    --url http://localhost:9909/ \
+    --header 'content-type: application/json' \
+    --data '{
+  "messageMapId": "remove-item",
+  "key": "obj"
+  }'
+$ {"value":"example value"}
+```
+
+```bash
+$ curl --request POST \
+    --url http://localhost:9909/ \
+    --header 'content-type: application/json' \
+    --data '{
+  "messageMapId": "get-item",
+  "key": "obj"
+  }'
+$ {"value":null}
+```
+
+**Removing non-existing value**
+
+```bash
+$ curl --request POST \
+    --verbose \
+    --url http://localhost:9909/ \
+    --header 'content-type: application/json' \
+    --data '{
+  "messageMapId": "remove-item",
+  "key": "obj"
+  }'
+$ * TCP_NODELAY set
+  * Connected to localhost (::1) port 9909 (#0)
+  > POST / HTTP/1.1
+  > Host: localhost:9909
+  > User-Agent: curl/7.68.0
+  > Accept: */*
+  > content-type: application/json
+  > Content-Length: 53
+  > 
+  * upload completely sent off: 53 out of 53 bytes
+  * Mark bundle as not supporting multiuse
+  < HTTP/1.1 404 Not Found
+  < Content-Type: application/json
+  < Content-Length: 2
+  < Connection: keep-alive
+  < 
+  * Connection #0 to host localhost left intact
+$ {}
+```
+
+**Clearing internal storage**
+
+```bash
+$ curl --request POST \
+    --url http://localhost:9909/ \
+    --header 'content-type: application/json' \
+    --data '{
+  "messageMapId": "clear-storage"
+  }'
+$ {}
+```
